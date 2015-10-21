@@ -19,27 +19,17 @@ package fr.treeptik.cloudunit.dto;
 
 import java.io.Serializable;
 
-public class JsonResponse
-    implements Serializable {
+public class DockerResponse
+        implements Serializable {
 
     private int status;
 
-    private String message = "";
+    private String body;
 
-    private String location = "";
-
-    public JsonResponse(int status, String message, String location) {
+    public DockerResponse(int status, String body) {
         this.status = status;
-        this.message = message;
-        this.location = location;
-    }
+        this.body = body;
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public int getStatus() {
@@ -50,11 +40,5 @@ public class JsonResponse
         this.status = status;
     }
 
-    public String getMessage() {
-        return message;
-    }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }
