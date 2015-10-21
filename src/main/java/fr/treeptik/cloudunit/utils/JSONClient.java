@@ -15,7 +15,7 @@
  * For any questions, contact us : contact@treeptik.fr
  */
 
-package fr.treeptik.cloudunit.docker;
+package fr.treeptik.cloudunit.utils;
 
 import fr.treeptik.cloudunit.dto.DockerResponse;
 import fr.treeptik.cloudunit.exception.JSONClientException;
