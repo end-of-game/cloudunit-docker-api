@@ -52,7 +52,13 @@ public class UsualDockerCommandTests {
     }
 
     @Test
-    public void test01_startContainer() throws DockerJSONException {
+    public void test01_findContainer() throws DockerJSONException {
+        Container container = ContainerBuilder.aContainer().withName("myContainer").build();
+        dockerClient.findContainer(container, DOCKER_HOST);
+    }
+
+    @Test
+    public void test02_startContainer() throws DockerJSONException {
         HostConfig hostConfig = HostConfigBuilder.aHostConfig()
                 .withLinks(new ArrayList<>())
                 .withBinds(new ArrayList<>())
@@ -68,8 +74,10 @@ public class UsualDockerCommandTests {
     }
 
     @Test
-    public void test02_stopContainer() throws DockerJSONException {
+    public void test03_stopContainer() throws DockerJSONException {
         Container container = ContainerBuilder.aContainer().withName("myContainer").build();
         dockerClient.stopContainer(container, DOCKER_HOST);
     }
+
+
 }

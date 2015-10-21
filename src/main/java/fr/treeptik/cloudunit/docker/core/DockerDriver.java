@@ -7,7 +7,9 @@ import fr.treeptik.cloudunit.exception.FatalDockerJSONException;
 /**
  * Created by guillaume on 21/10/15.
  */
-public interface Driver {
+public interface DockerDriver {
+
+    DockerResponse find(Container container, String hostIp) throws FatalDockerJSONException;
 
     DockerResponse create(Container container, String hostIp) throws FatalDockerJSONException;
 

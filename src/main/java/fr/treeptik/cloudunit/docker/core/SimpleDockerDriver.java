@@ -31,11 +31,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class SimpleDockerDriver implements Driver {
+public class SimpleDockerDriver implements DockerDriver {
 
     private static Logger logger = LoggerFactory.getLogger(SimpleDockerDriver.class);
 
     private JSONClient client = new JSONClient();
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     /*
         public ConcurrentLinkedQueue<Integer> forbbidenPorts = new ConcurrentLinkedQueue<Integer>();
@@ -75,291 +77,293 @@ public class SimpleDockerDriver implements Driver {
 
 */
 
+
+
     /*
-            public DockerContainer findOne(String name, String hostIp)
-                throws DockerJSONException {
-                URI uri = null;
-                DockerContainer dockerContainer = new DockerContainer();
-                try {
-                    uri = new URIBuilder().setScheme("http").setHost(hostIp)
-                        .setPath("/containers/" + name + "/json").build();
-
-                    // Docker error management
-                    JsonResponse jsonResponse;
-
+                public DockerContainer findOne(String name, String hostIp)
+                    throws DockerJSONException {
+                    URI uri = null;
+                    DockerContainer dockerContainer = new DockerContainer();
                     try {
+                        uri = new URIBuilder().setScheme("http").setHost(hostIp)
+                            .setPath("/containers/" + name + "/json").build();
 
-                        jsonResponse = client.sendGet(uri);
+                        // Docker error management
+                        JsonResponse jsonResponse;
 
-                        switch (jsonResponse.getStatus()) {
-                            case 404:
-                                throw new ErrorDockerJSONException(
-                                    "docker : no such container");
-                            case 500:
-                                throw new ErrorDockerJSONException("docker : server error");
+                        try {
+
+                            jsonResponse = client.sendGet(uri);
+
+                            switch (jsonResponse.getStatus()) {
+                                case 404:
+                                    throw new ErrorDockerJSONException(
+                                        "docker : no such container");
+                                case 500:
+                                    throw new ErrorDockerJSONException("docker : server error");
+                            }
+
+                        } catch (IOException e) {
+                            throw new FatalDockerJSONException(e.getLocalizedMessage());
                         }
 
-                    } catch (IOException e) {
-                        throw new FatalDockerJSONException(e.getLocalizedMessage());
-                    }
+                        // Init maps for volumes and ports
 
-                    // Init maps for volumes and ports
+                        Map<String, String> ports = new HashMap<>();
+                        Map<String, String> volumes = new HashMap<>();
 
-                    Map<String, String> ports = new HashMap<>();
-                    Map<String, String> volumes = new HashMap<>();
+                        // SubString to remove the "/"
+                        String response = jsonResponse.getMessage();
 
-                    // SubString to remove the "/"
-                    String response = jsonResponse.getMessage();
+                        dockerContainer.setName(parser(response).get("Name").toString()
+                            .substring(1));
+                        dockerContainer.setId((String) parser(response).get("Id")
+                            .toString());
 
-                    dockerContainer.setName(parser(response).get("Name").toString()
-                        .substring(1));
-                    dockerContainer.setId((String) parser(response).get("Id")
-                        .toString());
+                        Long memorySwap = (Long) parser(
+                            parser(response).get("Config").toString())
+                            .get("MemorySwap");
+                        Long memory = (Long) parser(
+                            parser(response).get("Config").toString()).get("Memory");
+                        dockerContainer.setMemorySwap(memorySwap);
+                        dockerContainer.setMemory(memory);
+                        dockerContainer.setImage((String) parser(
+                            parser(response).get("Config").toString()).get("Image"));
 
-                    Long memorySwap = (Long) parser(
-                        parser(response).get("Config").toString())
-                        .get("MemorySwap");
-                    Long memory = (Long) parser(
-                        parser(response).get("Config").toString()).get("Memory");
-                    dockerContainer.setMemorySwap(memorySwap);
-                    dockerContainer.setMemory(memory);
-                    dockerContainer.setImage((String) parser(
-                        parser(response).get("Config").toString()).get("Image"));
+                        if (parser(parser(response).get("HostConfig").toString()).get(
+                            "VolumesFrom") != null) {
+                            dockerContainer.setVolumesFrom(getList(parser(parser(response)
+                                    .get("HostConfig").toString()),
+                                "VolumesFrom"));
+                        }
 
-                    if (parser(parser(response).get("HostConfig").toString()).get(
-                        "VolumesFrom") != null) {
-                        dockerContainer.setVolumesFrom(getList(parser(parser(response)
-                                .get("HostConfig").toString()),
-                            "VolumesFrom"));
-                    }
+                        dockerContainer.setIp((String) parser(
+                            parser(response).get("NetworkSettings").toString()).get(
+                            "IPAddress"));
 
-                    dockerContainer.setIp((String) parser(
-                        parser(response).get("NetworkSettings").toString()).get(
-                        "IPAddress"));
+                        if (parser(parser(response).get("NetworkSettings").toString()).get(
+                            "Ports") != null) {
+                            for (Object port : parser(
+                                parser(
+                                    parser(response).get("NetworkSettings")
+                                        .toString()).get("Ports").toString())
+                                .keySet()) {
 
-                    if (parser(parser(response).get("NetworkSettings").toString()).get(
-                        "Ports") != null) {
-                        for (Object port : parser(
-                            parser(
-                                parser(response).get("NetworkSettings")
-                                    .toString()).get("Ports").toString())
-                            .keySet()) {
-
-                            if (!Arrays.asList(fixedPort).contains(port.toString())) {
-                                Object forwardedPort = (Object) getObjectList(
-                                    parser(parser(
-                                        parser(response).get("NetworkSettings")
-                                            .toString()).get("Ports")
-                                        .toString()),
-                                    port.toString()).get(0);
-                                ports.put(port.toString(),
-                                    parser(forwardedPort.toString())
-                                        .get("HostPort").toString());
+                                if (!Arrays.asList(fixedPort).contains(port.toString())) {
+                                    Object forwardedPort = (Object) getObjectList(
+                                        parser(parser(
+                                            parser(response).get("NetworkSettings")
+                                                .toString()).get("Ports")
+                                            .toString()),
+                                        port.toString()).get(0);
+                                    ports.put(port.toString(),
+                                        parser(forwardedPort.toString())
+                                            .get("HostPort").toString());
+                                }
                             }
                         }
-                    }
 
-                    if (parser(response).get("Volumes") != null) {
-                        for (Object volume : parser(
-                            parser(response).get("Volumes").toString()).keySet()) {
+                        if (parser(response).get("Volumes") != null) {
+                            for (Object volume : parser(
+                                parser(response).get("Volumes").toString()).keySet()) {
 
-                            volumes.put(volume.toString(),
-                                parser(parser(response).get("Volumes").toString())
-                                    .get(volume.toString()).toString());
+                                volumes.put(volume.toString(),
+                                    parser(parser(response).get("Volumes").toString())
+                                        .get(volume.toString()).toString());
 
-                        }
-                    }
-
-                    dockerContainer.setVolumes(volumes);
-
-                    logger.debug("Volumes : " + volumes);
-
-                    dockerContainer.setPorts(ports);
-                    dockerContainer.setCmd(getList(parser(parser(response)
-                        .get("Config").toString()), "Cmd"));
-                    if (parser(parser(response).get("State").toString()).get("Running")
-                        .toString().equals("true")) {
-                        dockerContainer.setState("Running");
-                    }
-
-                    if (parser(parser(response).get("State").toString()).get("Running")
-                        .toString().equals("false")
-                        && parser(parser(response).get("State").toString())
-                        .get("Paused").toString().equals("false")) {
-                        dockerContainer.setState("Paused");
-                    }
-
-                    if (parser(parser(response).get("State").toString()).get("Paused")
-                        .toString().equals("true")) {
-                        dockerContainer.setState("Paused");
-                    }
-
-                } catch (NumberFormatException | URISyntaxException | ParseException e) {
-                    StringBuilder msgError = new StringBuilder(256);
-                    msgError.append(name).append(",hostIP=").append(hostIp)
-                        .append(",uri=").append(uri);
-                    logger.error("" + msgError, e);
-                    throw new FatalDockerJSONException("docker : error fatal");
-                }
-
-                return dockerContainer;
-            }
-
-            public DockerContainer findOneWithImageID(String name, String hostIp)
-                throws DockerJSONException {
-                URI uri = null;
-                DockerContainer dockerContainer = new DockerContainer();
-                try {
-                    uri = new URIBuilder().setScheme("http").setHost(hostIp).setPath("/containers/" + name + "/json").build();
-                    JsonResponse jsonResponse;
-                    // Docker error management
-                    try {
-                        jsonResponse = client.sendGet(uri);
-                        switch (jsonResponse.getStatus()) {
-                            case 404:
-                                throw new ErrorDockerJSONException(
-                                    "docker : no such container");
-                            case 500:
-                                throw new ErrorDockerJSONException("docker : server error");
-                        }
-
-                    } catch (IOException e) {
-                        throw new FatalDockerJSONException(e.getLocalizedMessage());
-                    }
-
-                    // Init maps for volumes and ports
-
-                    Map<String, String> ports = new HashMap<>();
-                    Map<String, String> volumes = new HashMap<>();
-
-                    // SubString to remove the "/"
-                    String response = jsonResponse.getMessage();
-
-                    dockerContainer.setImageID((String) parser(response).get("Image")
-                        .toString());
-                    dockerContainer.setName(parser(response).get("Name").toString()
-                        .substring(1));
-                    dockerContainer.setId((String) parser(response).get("Id")
-                        .toString());
-
-                    Long memorySwap = (Long) parser(
-                        parser(response).get("Config").toString())
-                        .get("MemorySwap");
-                    Long memory = (Long) parser(
-                        parser(response).get("Config").toString()).get("Memory");
-                    dockerContainer.setMemorySwap(memorySwap);
-                    dockerContainer.setMemory(memory);
-                    dockerContainer.setImage((String) parser(
-                        parser(response).get("Config").toString()).get("Image"));
-
-                    if (parser(parser(response).get("HostConfig").toString()).get(
-                        "VolumesFrom") != null) {
-                        dockerContainer.setVolumesFrom(getList(parser(parser(response)
-                                .get("HostConfig").toString()),
-                            "VolumesFrom"));
-                    }
-
-                    dockerContainer.setIp((String) parser(
-                        parser(response).get("NetworkSettings").toString()).get(
-                        "IPAddress"));
-
-                    if (parser(parser(response).get("NetworkSettings").toString()).get(
-                        "Ports") != null) {
-                        for (Object port : parser(
-                            parser(
-                                parser(response).get("NetworkSettings")
-                                    .toString()).get("Ports").toString())
-                            .keySet()) {
-
-                            if (!Arrays.asList(fixedPort).contains(port.toString())) {
-                                Object forwardedPort = (Object) getObjectList(
-                                    parser(parser(
-                                        parser(response).get("NetworkSettings")
-                                            .toString()).get("Ports")
-                                        .toString()),
-                                    port.toString()).get(0);
-                                ports.put(port.toString(),
-                                    parser(forwardedPort.toString())
-                                        .get("HostPort").toString());
                             }
                         }
-                    }
 
-                    if (parser(response).get("Volumes") != null) {
-                        for (Object volume : parser(
-                            parser(response).get("Volumes").toString()).keySet()) {
+                        dockerContainer.setVolumes(volumes);
 
-                            volumes.put(volume.toString(),
-                                parser(parser(response).get("Volumes").toString())
-                                    .get(volume.toString()).toString());
+                        logger.debug("Volumes : " + volumes);
 
+                        dockerContainer.setPorts(ports);
+                        dockerContainer.setCmd(getList(parser(parser(response)
+                            .get("Config").toString()), "Cmd"));
+                        if (parser(parser(response).get("State").toString()).get("Running")
+                            .toString().equals("true")) {
+                            dockerContainer.setState("Running");
                         }
+
+                        if (parser(parser(response).get("State").toString()).get("Running")
+                            .toString().equals("false")
+                            && parser(parser(response).get("State").toString())
+                            .get("Paused").toString().equals("false")) {
+                            dockerContainer.setState("Paused");
+                        }
+
+                        if (parser(parser(response).get("State").toString()).get("Paused")
+                            .toString().equals("true")) {
+                            dockerContainer.setState("Paused");
+                        }
+
+                    } catch (NumberFormatException | URISyntaxException | ParseException e) {
+                        StringBuilder msgError = new StringBuilder(256);
+                        msgError.append(name).append(",hostIP=").append(hostIp)
+                            .append(",uri=").append(uri);
+                        logger.error("" + msgError, e);
+                        throw new FatalDockerJSONException("docker : error fatal");
                     }
 
-                    dockerContainer.setVolumes(volumes);
-
-                    logger.debug("Volumes : " + volumes);
-
-                    dockerContainer.setPorts(ports);
-                    dockerContainer.setCmd(getList(parser(parser(response)
-                        .get("Config").toString()), "Cmd"));
-                    if (parser(parser(response).get("State").toString()).get("Running")
-                        .toString().equals("true")) {
-                        dockerContainer.setState("Running");
-                    }
-
-                    if (parser(parser(response).get("State").toString()).get("Running")
-                        .toString().equals("false")
-                        && parser(parser(response).get("State").toString())
-                        .get("Paused").toString().equals("false")) {
-                        dockerContainer.setState("Paused");
-                    }
-
-                    if (parser(parser(response).get("State").toString()).get("Paused")
-                        .toString().equals("true")) {
-                        dockerContainer.setState("Paused");
-                    }
-
-                } catch (NumberFormatException | URISyntaxException | ParseException e) {
-                    StringBuilder msgError = new StringBuilder(256);
-                    msgError.append(name).append(",hostIP=").append(hostIp)
-                        .append(",uri=").append(uri);
-                    logger.error("" + msgError, e);
-                    throw new FatalDockerJSONException("docker : error fatal");
+                    return dockerContainer;
                 }
 
-                return dockerContainer;
-            }
+                public DockerContainer findOneWithImageID(String name, String hostIp)
+                    throws DockerJSONException {
+                    URI uri = null;
+                    DockerContainer dockerContainer = new DockerContainer();
+                    try {
+                        uri = new URIBuilder().setScheme("http").setHost(hostIp).setPath("/containers/" + name + "/json").build();
+                        JsonResponse jsonResponse;
+                        // Docker error management
+                        try {
+                            jsonResponse = client.sendGet(uri);
+                            switch (jsonResponse.getStatus()) {
+                                case 404:
+                                    throw new ErrorDockerJSONException(
+                                        "docker : no such container");
+                                case 500:
+                                    throw new ErrorDockerJSONException("docker : server error");
+                            }
 
-            public String checkDockerInfos(String hostAddress)
-                throws DockerJSONException {
-                URI uri = null;
-                JsonResponse jsonResponse;
-                try {
-                    uri = new URIBuilder().setScheme("http").setHost(hostAddress)
-                        .setPath("/info").build();
+                        } catch (IOException e) {
+                            throw new FatalDockerJSONException(e.getLocalizedMessage());
+                        }
 
-                    jsonResponse = client.sendGet(uri);
-                    if (jsonResponse.getStatus() == 500) {
-                        throw new ErrorDockerJSONException("server error");
+                        // Init maps for volumes and ports
+
+                        Map<String, String> ports = new HashMap<>();
+                        Map<String, String> volumes = new HashMap<>();
+
+                        // SubString to remove the "/"
+                        String response = jsonResponse.getMessage();
+
+                        dockerContainer.setImageID((String) parser(response).get("Image")
+                            .toString());
+                        dockerContainer.setName(parser(response).get("Name").toString()
+                            .substring(1));
+                        dockerContainer.setId((String) parser(response).get("Id")
+                            .toString());
+
+                        Long memorySwap = (Long) parser(
+                            parser(response).get("Config").toString())
+                            .get("MemorySwap");
+                        Long memory = (Long) parser(
+                            parser(response).get("Config").toString()).get("Memory");
+                        dockerContainer.setMemorySwap(memorySwap);
+                        dockerContainer.setMemory(memory);
+                        dockerContainer.setImage((String) parser(
+                            parser(response).get("Config").toString()).get("Image"));
+
+                        if (parser(parser(response).get("HostConfig").toString()).get(
+                            "VolumesFrom") != null) {
+                            dockerContainer.setVolumesFrom(getList(parser(parser(response)
+                                    .get("HostConfig").toString()),
+                                "VolumesFrom"));
+                        }
+
+                        dockerContainer.setIp((String) parser(
+                            parser(response).get("NetworkSettings").toString()).get(
+                            "IPAddress"));
+
+                        if (parser(parser(response).get("NetworkSettings").toString()).get(
+                            "Ports") != null) {
+                            for (Object port : parser(
+                                parser(
+                                    parser(response).get("NetworkSettings")
+                                        .toString()).get("Ports").toString())
+                                .keySet()) {
+
+                                if (!Arrays.asList(fixedPort).contains(port.toString())) {
+                                    Object forwardedPort = (Object) getObjectList(
+                                        parser(parser(
+                                            parser(response).get("NetworkSettings")
+                                                .toString()).get("Ports")
+                                            .toString()),
+                                        port.toString()).get(0);
+                                    ports.put(port.toString(),
+                                        parser(forwardedPort.toString())
+                                            .get("HostPort").toString());
+                                }
+                            }
+                        }
+
+                        if (parser(response).get("Volumes") != null) {
+                            for (Object volume : parser(
+                                parser(response).get("Volumes").toString()).keySet()) {
+
+                                volumes.put(volume.toString(),
+                                    parser(parser(response).get("Volumes").toString())
+                                        .get(volume.toString()).toString());
+
+                            }
+                        }
+
+                        dockerContainer.setVolumes(volumes);
+
+                        logger.debug("Volumes : " + volumes);
+
+                        dockerContainer.setPorts(ports);
+                        dockerContainer.setCmd(getList(parser(parser(response)
+                            .get("Config").toString()), "Cmd"));
+                        if (parser(parser(response).get("State").toString()).get("Running")
+                            .toString().equals("true")) {
+                            dockerContainer.setState("Running");
+                        }
+
+                        if (parser(parser(response).get("State").toString()).get("Running")
+                            .toString().equals("false")
+                            && parser(parser(response).get("State").toString())
+                            .get("Paused").toString().equals("false")) {
+                            dockerContainer.setState("Paused");
+                        }
+
+                        if (parser(parser(response).get("State").toString()).get("Paused")
+                            .toString().equals("true")) {
+                            dockerContainer.setState("Paused");
+                        }
+
+                    } catch (NumberFormatException | URISyntaxException | ParseException e) {
+                        StringBuilder msgError = new StringBuilder(256);
+                        msgError.append(name).append(",hostIP=").append(hostIp)
+                            .append(",uri=").append(uri);
+                        logger.error("" + msgError, e);
+                        throw new FatalDockerJSONException("docker : error fatal");
                     }
 
-                } catch (NumberFormatException | URISyntaxException | IOException e) {
-
-                    throw new FatalDockerJSONException("docker : error fatal");
+                    return dockerContainer;
                 }
-                return jsonResponse.getMessage();
-            }
 
-            /**
-             * /containers/json : not same format as an inspect of container List all
-             * Running or Paused containers retrieve name (with cloudunit format), image
-             * and state
-             *
-             * @param hostAddress : host address
-             * @return
-             * @throws DockerJSONException
-             */
+                public String checkDockerInfos(String hostAddress)
+                    throws DockerJSONException {
+                    URI uri = null;
+                    JsonResponse jsonResponse;
+                    try {
+                        uri = new URIBuilder().setScheme("http").setHost(hostAddress)
+                            .setPath("/info").build();
+
+                        jsonResponse = client.sendGet(uri);
+                        if (jsonResponse.getStatus() == 500) {
+                            throw new ErrorDockerJSONException("server error");
+                        }
+
+                    } catch (NumberFormatException | URISyntaxException | IOException e) {
+
+                        throw new FatalDockerJSONException("docker : error fatal");
+                    }
+                    return jsonResponse.getMessage();
+                }
+
+                /**
+                 * /containers/json : not same format as an inspect of container List all
+                 * Running or Paused containers retrieve name (with cloudunit format), image
+                 * and state
+                 *
+                 * @param hostAddress : host address
+                 * @return
+                 * @throws DockerJSONException
+                 */
     /*    public List<DockerContainer> listAllContainers(String hostAddress)
             throws DockerJSONException {
 
@@ -437,16 +441,44 @@ public class SimpleDockerDriver implements Driver {
         return listContainers;
     }
 */
+
+    @Override
+    public DockerResponse find(Container container, String hostIp) throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(hostIp)
+                    .setPath("/containers/" + container.getName() + "/json")
+                    .build();
+            dockerResponse = client.sendGet(uri);
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occured for create container request due to " + e.getMessage(), e);
+        }
+
+        return dockerResponse;
+    }
+
     @Override
     public DockerResponse create(Container container, String hostIp) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
-            uri = new URIBuilder().setScheme("http").setHost(hostIp)
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(hostIp)
                     .setPath("/containers/create")
-                    .setParameter("name", container.getName()).build();
-            body = new ObjectMapper().writeValueAsString(container.getConfig());
+                    .setParameter("name", container.getName())
+                    .build();
+            body = objectMapper.writeValueAsString(container.getConfig());
             logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri, body, "application/json");
         } catch (URISyntaxException | IOException | JSONClientException e) {
@@ -472,8 +504,9 @@ public class SimpleDockerDriver implements Driver {
                     .setHost(hostIp)
                     .setPath(
                             "/containers/" + container.getName()
-                                    + "/start").build();
-            body = new ObjectMapper().writeValueAsString(container.getConfig().getHostConfig());
+                                    + "/start")
+                    .build();
+            body = objectMapper.writeValueAsString(container.getConfig().getHostConfig());
             logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri,
                     body, "application/json");
@@ -499,7 +532,8 @@ public class SimpleDockerDriver implements Driver {
                     .setHost(hostIp)
                     .setPath(
                             "/containers/" + container.getName()
-                                    + "/stop").build();
+                                    + "/stop")
+                    .build();
             logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri,
                     body, "application/json");
