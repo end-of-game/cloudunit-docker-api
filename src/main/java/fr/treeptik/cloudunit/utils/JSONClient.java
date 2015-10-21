@@ -85,7 +85,9 @@ public class JSONClient {
         try {
             httpPost.setEntity(new StringEntity(body));
             response = httpclient.execute(httpPost);
-            IOUtils.copy(response.getEntity().getContent(), writer, "UTF-8");
+            if (response.getEntity() != null) {
+                IOUtils.copy(response.getEntity().getContent(), writer, "UTF-8");
+            }
         } catch (IOException e) {
             throw new JSONClientException("Error in sendPost method due to : " + e.getMessage(), e);
         }

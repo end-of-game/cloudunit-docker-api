@@ -20,7 +20,7 @@ import java.util.HashMap;
  * Created by guillaume on 21/10/15.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CreateContainerTest {
+public class UsualDockerCommandTests {
 
     private static DockerClient dockerClient;
     private static final String DOCKER_HOST = "192.168.50.4:4243";
@@ -32,20 +32,44 @@ public class CreateContainerTest {
     }
 
     @Test
-    public void test00_createASimpleContainer() throws DockerJSONException {
+    public void test00_createContainer() throws DockerJSONException {
         HostConfig hostConfig = HostConfigBuilder.aHostConfig().withVolumesFrom(new ArrayList<>()).build();
         Config config = ConfigBuilder.aConfig()
                 .withAttachStdin(Boolean.FALSE)
                 .withAttachStdout(Boolean.TRUE)
                 .withAttachStderr(Boolean.TRUE)
-                .withCmd(Arrays.asList("date"))
-                .withImage("ubuntu")
+                .withCmd(Arrays.asList("/bin/bash", "/cloudunit/scripts/start-service.sh", "johndoe", "abc2015",
+                        "192.168.2.116", "172.17.0.221", "aaaa",
+                        "AezohghooNgaegh8ei2jabib2nuj9yoe", "main"))
+                .withImage("cloudunit/git")
                 .withHostConfig(hostConfig)
                 .withExposedPorts(new HashMap<>())
-                .withMemory(512000L)
-                .withMemorySwap(1L)
+                .withMemory(0L)
+                .withMemorySwap(0L)
                 .build();
         Container container = ContainerBuilder.aContainer().withName("myContainer").withConfig(config).build();
         dockerClient.createContainer(container, DOCKER_HOST);
+    }
+
+    @Test
+    public void test01_startContainer() throws DockerJSONException {
+        HostConfig hostConfig = HostConfigBuilder.aHostConfig()
+                .withLinks(new ArrayList<>())
+                .withBinds(new ArrayList<>())
+                .withPortBindings(new HashMap<>())
+                .withPrivileged(Boolean.FALSE)
+                .withPublishAllPorts(Boolean.TRUE)
+                .withVolumesFrom(new ArrayList<>()).build();
+        Config config = ConfigBuilder.aConfig()
+                .withHostConfig(hostConfig)
+                .build();
+        Container container = ContainerBuilder.aContainer().withName("myContainer").withConfig(config).build();
+        dockerClient.startContainer(container, DOCKER_HOST);
+    }
+
+    @Test
+    public void test02_stopContainer() throws DockerJSONException {
+        Container container = ContainerBuilder.aContainer().withName("myContainer").build();
+        dockerClient.stopContainer(container, DOCKER_HOST);
     }
 }

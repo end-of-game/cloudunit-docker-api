@@ -27,6 +27,24 @@ public class DockerClient {
         }
     }
 
+    public void startContainer(Container container, String hostIp) throws DockerJSONException {
+        try {
+            DockerResponse dockerResponse = driver.start(container, hostIp);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+    }
+
+    public void stopContainer(Container container, String hostIp) throws DockerJSONException {
+        try {
+            DockerResponse dockerResponse = driver.stop(container, hostIp);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+    }
+
     private void handleDockerAPIError(DockerResponse dockerResponse) throws DockerJSONException {
         switch (dockerResponse.getStatus()) {
             case 101:

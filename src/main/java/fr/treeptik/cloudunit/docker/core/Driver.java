@@ -10,4 +10,9 @@ import fr.treeptik.cloudunit.exception.FatalDockerJSONException;
 public interface Driver {
 
     DockerResponse create(Container container, String hostIp) throws FatalDockerJSONException;
+
+    DockerResponse start(Container container, String hostIp) throws FatalDockerJSONException;
+
+    DockerResponse stop(Container container, String hostIp) throws FatalDockerJSONException;
+
 }

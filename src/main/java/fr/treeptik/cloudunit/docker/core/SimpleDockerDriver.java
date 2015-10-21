@@ -440,13 +440,13 @@ public class SimpleDockerDriver implements Driver {
     @Override
     public DockerResponse create(Container container, String hostIp) throws FatalDockerJSONException {
         URI uri = null;
-        String body = null;
+        String body = new String();
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder().setScheme("http").setHost(hostIp)
                     .setPath("/containers/create")
                     .setParameter("name", container.getName()).build();
-            body = new ObjectMapper().writeValueAsString(container);
+            body = new ObjectMapper().writeValueAsString(container.getConfig());
             logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri, body, "application/json");
         } catch (URISyntaxException | IOException | JSONClientException e) {
@@ -458,6 +458,59 @@ public class SimpleDockerDriver implements Driver {
             throw new FatalDockerJSONException("An error has occured for create container request due to " + e.getMessage(), e);
         }
 
+        return dockerResponse;
+    }
+
+    @Override
+    public DockerResponse start(Container container, String hostIp) throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(hostIp)
+                    .setPath(
+                            "/containers/" + container.getName()
+                                    + "/start").build();
+            body = new ObjectMapper().writeValueAsString(container.getConfig().getHostConfig());
+            logger.debug("body = " + body);
+            dockerResponse = client.sendPost(uri,
+                    body, "application/json");
+        } catch (URISyntaxException | IOException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occured for create container request due to " + e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    @Override
+    public DockerResponse stop(Container container, String hostIp) throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(hostIp)
+                    .setPath(
+                            "/containers/" + container.getName()
+                                    + "/stop").build();
+            logger.debug("body = " + body);
+            dockerResponse = client.sendPost(uri,
+                    body, "application/json");
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occured for create container request due to " + e.getMessage(), e);
+        }
         return dockerResponse;
     }
 /*

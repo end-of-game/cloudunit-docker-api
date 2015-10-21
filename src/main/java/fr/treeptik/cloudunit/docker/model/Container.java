@@ -1,5 +1,6 @@
 package fr.treeptik.cloudunit.docker.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.io.Serializable;
  */
 public class Container implements Serializable {
 
-    @JsonProperty("Name")
+    @JsonIgnore
     private String name;
 
     @JsonProperty("Config")
