@@ -17,10 +17,10 @@ public class NetworkSettings implements Serializable {
     private String gateway;
 
     @JsonProperty("IPAddress")
-    private String iPAddress;
+    private String IPAddress;
 
     @JsonProperty("IPPrefixLen")
-    private Long iPPrefixLen;
+    private Long IPPrefixLen;
 
     @JsonProperty("GlobalIPv6Address")
     private String globalIPv6Address;
@@ -29,7 +29,7 @@ public class NetworkSettings implements Serializable {
     private Long globalIPv6PrefixLen;
 
     @JsonProperty("IPv6Gateway")
-    private String iPv6Gateway;
+    private String IPv6Gateway;
 
     @JsonProperty("LinkLocalIPv6Address")
     private String linkLocalIPv6Address;
@@ -62,20 +62,20 @@ public class NetworkSettings implements Serializable {
         this.gateway = gateway;
     }
 
-    public String getiPAddress() {
-        return iPAddress;
+    public String getIPAddress() {
+        return IPAddress;
     }
 
-    public void setiPAddress(String iPAddress) {
-        this.iPAddress = iPAddress;
+    public void setIPAddress(String IPAddress) {
+        this.IPAddress = IPAddress;
     }
 
-    public Long getiPPrefixLen() {
-        return iPPrefixLen;
+    public Long getIPPrefixLen() {
+        return IPPrefixLen;
     }
 
-    public void setiPPrefixLen(Long iPPrefixLen) {
-        this.iPPrefixLen = iPPrefixLen;
+    public void setIPPrefixLen(Long IPPrefixLen) {
+        this.IPPrefixLen = IPPrefixLen;
     }
 
     public String getGlobalIPv6Address() {
@@ -84,6 +84,38 @@ public class NetworkSettings implements Serializable {
 
     public void setGlobalIPv6Address(String globalIPv6Address) {
         this.globalIPv6Address = globalIPv6Address;
+    }
+
+    public Long getGlobalIPv6PrefixLen() {
+        return globalIPv6PrefixLen;
+    }
+
+    public void setGlobalIPv6PrefixLen(Long globalIPv6PrefixLen) {
+        this.globalIPv6PrefixLen = globalIPv6PrefixLen;
+    }
+
+    public String getIPv6Gateway() {
+        return IPv6Gateway;
+    }
+
+    public void setIPv6Gateway(String IPv6Gateway) {
+        this.IPv6Gateway = IPv6Gateway;
+    }
+
+    public String getLinkLocalIPv6Address() {
+        return linkLocalIPv6Address;
+    }
+
+    public void setLinkLocalIPv6Address(String linkLocalIPv6Address) {
+        this.linkLocalIPv6Address = linkLocalIPv6Address;
+    }
+
+    public Long getLinkLocalIPv6PrefixLen() {
+        return linkLocalIPv6PrefixLen;
+    }
+
+    public void setLinkLocalIPv6PrefixLen(Long linkLocalIPv6PrefixLen) {
+        this.linkLocalIPv6PrefixLen = linkLocalIPv6PrefixLen;
     }
 
     public String getMacAddress() {
@@ -108,38 +140,5 @@ public class NetworkSettings implements Serializable {
 
     public void setPorts(Map<String, Object> ports) {
         this.ports = ports;
-    }
-
-    public Long getGlobalIPv6PrefixLen() {
-        return globalIPv6PrefixLen;
-    }
-
-    public void setGlobalIPv6PrefixLen(Long globalIPv6PrefixLen) {
-        this.globalIPv6PrefixLen = globalIPv6PrefixLen;
-    }
-
-    public String getIPv6Gateway() {
-        return iPv6Gateway;
-    }
-
-    public void setIPv6Gateway(String iPv6Gateway) {
-        this.iPv6Gateway = iPv6Gateway;
-    }
-
-
-    public String getLinkLocalIPv6Address() {
-        return linkLocalIPv6Address;
-    }
-
-    public void setLinkLocalIPv6Address(String linkLocalIPv6Address) {
-        this.linkLocalIPv6Address = linkLocalIPv6Address;
-    }
-
-    public Long getLinkLocalIPv6PrefixLen() {
-        return linkLocalIPv6PrefixLen;
-    }
-
-    public void setLinkLocalIPv6PrefixLen(Long linkLocalIPv6PrefixLen) {
-        this.linkLocalIPv6PrefixLen = linkLocalIPv6PrefixLen;
     }
 }

@@ -95,15 +95,6 @@ public class Container implements Serializable {
     @JsonProperty("Status")
     private String status;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
     public Config getConfig() {
         return config;
     }
@@ -192,45 +183,12 @@ public class Container implements Serializable {
         this.logPath = logPath;
     }
 
-
-    public Long getRestartCount() {
-        return restartCount;
+    public String getId() {
+        return id;
     }
 
-    public void setRestartCount(Long restartCount) {
-        this.restartCount = restartCount;
-    }
-
-    public String getResolvConfPath() {
-        return resolvConfPath;
-    }
-
-    public void setResolvConfPath(String resolvConfPath) {
-        this.resolvConfPath = resolvConfPath;
-    }
-
-    public String getProcessLabel() {
-        return processLabel;
-    }
-
-    public void setProcessLabel(String processLabel) {
-        this.processLabel = processLabel;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String getMountLabel() {
-        return mountLabel;
-    }
-
-    public void setMountLabel(String mountLabel) {
-        this.mountLabel = mountLabel;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getImage() {
@@ -241,12 +199,52 @@ public class Container implements Serializable {
         this.image = image;
     }
 
-    public String getId() {
-        return id;
+    public String getMountLabel() {
+        return mountLabel;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setMountLabel(String mountLabel) {
+        this.mountLabel = mountLabel;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getProcessLabel() {
+        return processLabel;
+    }
+
+    public void setProcessLabel(String processLabel) {
+        this.processLabel = processLabel;
+    }
+
+    public String getResolvConfPath() {
+        return resolvConfPath;
+    }
+
+    public void setResolvConfPath(String resolvConfPath) {
+        this.resolvConfPath = resolvConfPath;
+    }
+
+    public Long getRestartCount() {
+        return restartCount;
+    }
+
+    public void setRestartCount(Long restartCount) {
+        this.restartCount = restartCount;
     }
 
     public Map<String, String> getVolumes() {
@@ -279,5 +277,45 @@ public class Container implements Serializable {
 
     public void setNetworkSettings(NetworkSettings networkSettings) {
         this.networkSettings = networkSettings;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    public Map<String, String> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(Map<String, String> labels) {
+        this.labels = labels;
+    }
+
+    public List<String> getNames() {
+        return names;
+    }
+
+    public void setNames(List<String> names) {
+        this.names = names;
+    }
+
+    public List<Object> getPorts() {
+        return ports;
+    }
+
+    public void setPorts(List<Object> ports) {
+        this.ports = ports;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

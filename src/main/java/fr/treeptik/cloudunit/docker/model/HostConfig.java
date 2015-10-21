@@ -152,7 +152,6 @@ public class HostConfig implements Serializable {
         this.volumesFrom = volumesFrom;
     }
 
-
     public Long getBlkioWeight() {
         return blkioWeight;
     }
@@ -161,12 +160,140 @@ public class HostConfig implements Serializable {
         this.blkioWeight = blkioWeight;
     }
 
-    public List<Object> getUlimits() {
-        return ulimits;
+    public String getCapAdd() {
+        return capAdd;
     }
 
-    public void setUlimits(List<Object> ulimits) {
-        this.ulimits = ulimits;
+    public void setCapAdd(String capAdd) {
+        this.capAdd = capAdd;
+    }
+
+    public String getCapDrop() {
+        return capDrop;
+    }
+
+    public void setCapDrop(String capDrop) {
+        this.capDrop = capDrop;
+    }
+
+    public String getContainerIDFile() {
+        return containerIDFile;
+    }
+
+    public void setContainerIDFile(String containerIDFile) {
+        this.containerIDFile = containerIDFile;
+    }
+
+    public String getCpusetCpus() {
+        return cpusetCpus;
+    }
+
+    public void setCpusetCpus(String cpusetCpus) {
+        this.cpusetCpus = cpusetCpus;
+    }
+
+    public String getCpusetMems() {
+        return cpusetMems;
+    }
+
+    public void setCpusetMems(String cpusetMems) {
+        this.cpusetMems = cpusetMems;
+    }
+
+    public Long getCpuShares() {
+        return cpuShares;
+    }
+
+    public void setCpuShares(Long cpuShares) {
+        this.cpuShares = cpuShares;
+    }
+
+    public Long getCpuPeriod() {
+        return cpuPeriod;
+    }
+
+    public void setCpuPeriod(Long cpuPeriod) {
+        this.cpuPeriod = cpuPeriod;
+    }
+
+    public List<String> getDevices() {
+        return devices;
+    }
+
+    public void setDevices(List<String> devices) {
+        this.devices = devices;
+    }
+
+    public String getDns() {
+        return dns;
+    }
+
+    public void setDns(String dns) {
+        this.dns = dns;
+    }
+
+    public String getDnsSearch() {
+        return dnsSearch;
+    }
+
+    public void setDnsSearch(String dnsSearch) {
+        this.dnsSearch = dnsSearch;
+    }
+
+    public String getExtraHosts() {
+        return extraHosts;
+    }
+
+    public void setExtraHosts(String extraHosts) {
+        this.extraHosts = extraHosts;
+    }
+
+    public String getIpcMode() {
+        return ipcMode;
+    }
+
+    public void setIpcMode(String ipcMode) {
+        this.ipcMode = ipcMode;
+    }
+
+    public List<String> getLxcConf() {
+        return lxcConf;
+    }
+
+    public void setLxcConf(List<String> lxcConf) {
+        this.lxcConf = lxcConf;
+    }
+
+    public Long getMemory() {
+        return memory;
+    }
+
+    public void setMemory(Long memory) {
+        this.memory = memory;
+    }
+
+    public Long getMemorySwap() {
+        return memorySwap;
+    }
+
+    public void setMemorySwap(Long memorySwap) {
+        this.memorySwap = memorySwap;
+    }
+
+    public Boolean getOomKillDisable() {
+        return oomKillDisable;
+    }
+
+    public void setOomKillDisable(Boolean oomKillDisable) {
+        this.oomKillDisable = oomKillDisable;
+    }
+
+    public String getNetworkMode() {
+        return networkMode;
+    }
+
+    public void setNetworkMode(String networkMode) {
+        this.networkMode = networkMode;
     }
 
     public Boolean getReadonlyRootfs() {
@@ -185,140 +312,12 @@ public class HostConfig implements Serializable {
         this.securityOpt = securityOpt;
     }
 
-    public String getNetworkMode() {
-        return networkMode;
+    public List<Object> getUlimits() {
+        return ulimits;
     }
 
-    public void setNetworkMode(String networkMode) {
-        this.networkMode = networkMode;
-    }
-
-    public Boolean getOomKillDisable() {
-        return oomKillDisable;
-    }
-
-    public void setOomKillDisable(Boolean oomKillDisable) {
-        this.oomKillDisable = oomKillDisable;
-    }
-
-    public Long getMemorySwap() {
-        return memorySwap;
-    }
-
-    public void setMemorySwap(Long memorySwap) {
-        this.memorySwap = memorySwap;
-    }
-
-    public Long getMemory() {
-        return memory;
-    }
-
-    public void setMemory(Long memory) {
-        this.memory = memory;
-    }
-
-    public String getDns() {
-        return dns;
-    }
-
-    public void setDns(String dns) {
-        this.dns = dns;
-    }
-
-    public String getCpusetMems() {
-        return cpusetMems;
-    }
-
-    public void setCpusetMems(String cpusetMems) {
-        this.cpusetMems = cpusetMems;
-    }
-
-    public String getCpusetCpus() {
-        return cpusetCpus;
-    }
-
-    public void setCpusetCpus(String cpusetCpus) {
-        this.cpusetCpus = cpusetCpus;
-    }
-
-    public String getContainerIDFile() {
-        return containerIDFile;
-    }
-
-    public void setContainerIDFile(String containerIDFile) {
-        this.containerIDFile = containerIDFile;
-    }
-
-    public Long getCpuShares() {
-        return cpuShares;
-    }
-
-    public void setCpuShares(Long cpuShares) {
-        this.cpuShares = cpuShares;
-    }
-
-    public List<String> getDevices() {
-        return devices;
-    }
-
-    public void setDevices(List<String> devices) {
-        this.devices = devices;
-    }
-
-    public Long getCpuPeriod() {
-        return cpuPeriod;
-    }
-
-    public void setCpuPeriod(Long cpuPeriod) {
-        this.cpuPeriod = cpuPeriod;
-    }
-
-    public String getDnsSearch() {
-        return dnsSearch;
-    }
-
-    public void setDnsSearch(String dnsSearch) {
-        this.dnsSearch = dnsSearch;
-    }
-
-    public List<String> getLxcConf() {
-        return lxcConf;
-    }
-
-    public void setLxcConf(List<String> lxcConf) {
-        this.lxcConf = lxcConf;
-    }
-
-    public String getIpcMode() {
-        return ipcMode;
-    }
-
-    public void setIpcMode(String ipcMode) {
-        this.ipcMode = ipcMode;
-    }
-
-    public String getExtraHosts() {
-        return extraHosts;
-    }
-
-    public void setExtraHosts(String extraHosts) {
-        this.extraHosts = extraHosts;
-    }
-
-    public String getCapAdd() {
-        return capAdd;
-    }
-
-    public void setCapAdd(String capAdd) {
-        this.capAdd = capAdd;
-    }
-
-    public String getCapDrop() {
-        return capDrop;
-    }
-
-    public void setCapDrop(String capDrop) {
-        this.capDrop = capDrop;
+    public void setUlimits(List<Object> ulimits) {
+        this.ulimits = ulimits;
     }
 
     public String getCgroupParent() {
