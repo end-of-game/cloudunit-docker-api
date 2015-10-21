@@ -35,7 +35,7 @@ public class SimpleDockerDriver implements Driver {
 
     private static Logger logger = LoggerFactory.getLogger(SimpleDockerDriver.class);
 
-    private JSONClient client;
+    private JSONClient client = new JSONClient();
 
     /*
         public ConcurrentLinkedQueue<Integer> forbbidenPorts = new ConcurrentLinkedQueue<Integer>();
@@ -437,6 +437,7 @@ public class SimpleDockerDriver implements Driver {
         return listContainers;
     }
 */
+    @Override
     public DockerResponse create(Container container, String hostIp) throws FatalDockerJSONException {
         URI uri = null;
         String body = null;
@@ -446,6 +447,7 @@ public class SimpleDockerDriver implements Driver {
                     .setPath("/containers/create")
                     .setParameter("name", container.getName()).build();
             body = new ObjectMapper().writeValueAsString(container);
+            logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri, body, "application/json");
         } catch (URISyntaxException | IOException | JSONClientException e) {
             StringBuilder contextError = new StringBuilder(256);

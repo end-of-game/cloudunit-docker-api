@@ -1,62 +1,63 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>fr.treeptik</groupId>
-	<artifactId>cloudunit-docker-client</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
-	<name>docker-client</name>
-	<description>Another docker client</description>
-	<url>https://github.com/Treeptik/cloudunit-docker-client</url>
+    <groupId>fr.treeptik</groupId>
+    <artifactId>cloudunit-docker-client</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>docker-client</name>
+    <description>Another docker client</description>
+    <url>https://github.com/Treeptik/cloudunit-docker-client</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<autoReleaseAfterClose>true</autoReleaseAfterClose>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+    </properties>
 
-	<parent>
-		<groupId>org.sonatype.oss</groupId>
-		<artifactId>oss-parent</artifactId>
-		<version>7</version>
-	</parent>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
-	<licenses>
-		<license>
-			<name>The Affero GPL, Version 3.0</name>
-			<url> https://gnu.org/licenses/agpl.html</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>The Affero GPL, Version 3.0</name>
+            <url>https://gnu.org/licenses/agpl.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-	<scm>
-		<connection>scm:git:https://github.com/Treeptik/cloudunit-docker-api</connection>
-		<developerConnection>scm:git:git@github.com:Treeptik/cloudunit-docker-api</developerConnection>
-		<url>https://github.com/Treeptik/cloudunit-docker-api</url>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <connection>scm:git:https://github.com/Treeptik/cloudunit-docker-api</connection>
+        <developerConnection>scm:git:git@github.com:Treeptik/cloudunit-docker-api</developerConnection>
+        <url>https://github.com/Treeptik/cloudunit-docker-api</url>
+        <tag>HEAD</tag>
+    </scm>
 
-	<developers>
-		<developer>
-			<id>Nicolas</id>
-			<name>Nicolas MULLER</name>
-			<email>n.muller@treeptik.fr</email>
-		</developer>
-		<developer>
-			<id>Guillaume</id>
-			<name>Guillaume Martial</name>
-			<email>g.martial@treeptik.fr</email>
-		</developer>
-	</developers>
+    <developers>
+        <developer>
+            <id>Nicolas</id>
+            <name>Nicolas MULLER</name>
+            <email>n.muller@treeptik.fr</email>
+        </developer>
+        <developer>
+            <id>Guillaume</id>
+            <name>Guillaume Martial</name>
+            <email>g.martial@treeptik.fr</email>
+        </developer>
+    </developers>
 
-	<dependencies>
+    <dependencies>
 
         <!--compile deps-->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.6</version>
-		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.6</version>
+        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -85,39 +86,31 @@
         </dependency>
 
         <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-
-        <!-- jsonPath dependency -->
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>0.9.0</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>slf4j-api</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.6.3</version>
         </dependency>
 
         <!--test deps-->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<version>1.3</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+    </dependencies>
+
 
 	<build>
 		<plugins>

@@ -24,6 +24,7 @@ public class DockerResponse
 
     private int status;
 
+
     private String body;
 
     public DockerResponse(int status, String body) {
@@ -40,5 +41,12 @@ public class DockerResponse
         this.status = status;
     }
 
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
 
 }

@@ -3,7 +3,6 @@ package fr.treeptik.cloudunit.docker.core;
 import fr.treeptik.cloudunit.docker.builders.ConfigBuilder;
 import fr.treeptik.cloudunit.docker.builders.ContainerBuilder;
 import fr.treeptik.cloudunit.docker.builders.HostConfigBuilder;
-import fr.treeptik.cloudunit.docker.core.DockerClient;
 import fr.treeptik.cloudunit.docker.model.Config;
 import fr.treeptik.cloudunit.docker.model.Container;
 import fr.treeptik.cloudunit.docker.model.HostConfig;
@@ -39,7 +38,7 @@ public class CreateContainerTest {
                 .withAttachStdin(Boolean.FALSE)
                 .withAttachStdout(Boolean.TRUE)
                 .withAttachStderr(Boolean.TRUE)
-                .withCmd(Arrays.asList("/bin/sh"))
+                .withCmd(Arrays.asList("date"))
                 .withImage("ubuntu")
                 .withHostConfig(hostConfig)
                 .withExposedPorts(new HashMap<>())
