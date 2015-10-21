@@ -74,6 +74,11 @@ public class Container implements Serializable {
     @JsonProperty("VolumesRW")
     private Map<String, String> volumesRW;
 
+    @JsonProperty("State")
+    private State state;
+
+    @JsonProperty("NetworkSettings")
+    private NetworkSettings networkSettings;
 
     public String getName() {
         return name;

@@ -95,6 +95,15 @@ public class HostConfig implements Serializable {
     @JsonProperty("CgroupParent")
     private String cgroupParent;
 
+    @JsonProperty("PidMode")
+    private String pidMode;
+
+    @JsonProperty("RestartPolicy")
+    private RestartPolicy restartPolicy;
+
+    @JsonProperty("LogConfig")
+    private LogConfig logConfig;
+
     public Boolean getPrivileged() {
         return privileged;
     }
@@ -318,5 +327,29 @@ public class HostConfig implements Serializable {
 
     public void setCgroupParent(String cgroupParent) {
         this.cgroupParent = cgroupParent;
+    }
+
+    public String getPidMode() {
+        return pidMode;
+    }
+
+    public void setPidMode(String pidMode) {
+        this.pidMode = pidMode;
+    }
+
+    public RestartPolicy getRestartPolicy() {
+        return restartPolicy;
+    }
+
+    public void setRestartPolicy(RestartPolicy restartPolicy) {
+        this.restartPolicy = restartPolicy;
+    }
+
+    public LogConfig getLogConfig() {
+        return logConfig;
+    }
+
+    public void setLogConfig(LogConfig logConfig) {
+        this.logConfig = logConfig;
     }
 }

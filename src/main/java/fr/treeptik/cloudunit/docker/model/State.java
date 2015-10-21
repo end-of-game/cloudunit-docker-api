@@ -36,6 +36,9 @@ public class State implements Serializable {
     @JsonProperty("StartedAt")
     private String startedAt;
 
+    @JsonProperty("Dead")
+    private Boolean dead;
+
     public String getError() {
         return error;
     }
@@ -106,5 +109,13 @@ public class State implements Serializable {
 
     public void setStartedAt(String startedAt) {
         this.startedAt = startedAt;
+    }
+
+    public Boolean getDead() {
+        return dead;
+    }
+
+    public void setDead(Boolean dead) {
+        this.dead = dead;
     }
 }
