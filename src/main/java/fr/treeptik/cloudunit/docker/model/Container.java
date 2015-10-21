@@ -80,6 +80,21 @@ public class Container implements Serializable {
     @JsonProperty("NetworkSettings")
     private NetworkSettings networkSettings;
 
+    @JsonProperty("Command")
+    private String command;
+
+    @JsonProperty("Labels")
+    private Map<String, String> labels;
+
+    @JsonProperty("Names")
+    private List<String> names;
+
+    @JsonProperty("Ports")
+    private List<Object> ports;
+
+    @JsonProperty("Status")
+    private String status;
+
     public String getName() {
         return name;
     }
@@ -248,5 +263,21 @@ public class Container implements Serializable {
 
     public void setVolumesRW(Map<String, String> volumesRW) {
         this.volumesRW = volumesRW;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public NetworkSettings getNetworkSettings() {
+        return networkSettings;
+    }
+
+    public void setNetworkSettings(NetworkSettings networkSettings) {
+        this.networkSettings = networkSettings;
     }
 }

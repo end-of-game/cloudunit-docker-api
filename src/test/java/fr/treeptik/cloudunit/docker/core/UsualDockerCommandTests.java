@@ -7,9 +7,7 @@ import fr.treeptik.cloudunit.docker.model.Config;
 import fr.treeptik.cloudunit.docker.model.Container;
 import fr.treeptik.cloudunit.docker.model.HostConfig;
 import fr.treeptik.cloudunit.exception.DockerJSONException;
-import org.junit.BeforeClass;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
@@ -24,16 +22,24 @@ public class UsualDockerCommandTests {
 
     private static DockerClient dockerClient;
     private static final String DOCKER_HOST = "192.168.50.4:4243";
+    private static final String CONTAINER_NAME = "myContainer";
+    private static final int RUNNING_CONTAINERS = 8;
 
     @BeforeClass
     public static void setup() {
         dockerClient = new DockerClient();
+    }
+
+    @AfterClass
+    public static void tearDown() {
 
     }
 
     @Test
     public void test00_createContainer() throws DockerJSONException {
-        HostConfig hostConfig = HostConfigBuilder.aHostConfig().withVolumesFrom(new ArrayList<>()).build();
+        HostConfig hostConfig = HostConfigBuilder.aHostConfig()
+                .withVolumesFrom(new ArrayList<>())
+                .build();
         Config config = ConfigBuilder.aConfig()
                 .withAttachStdin(Boolean.FALSE)
                 .withAttachStdout(Boolean.TRUE)
@@ -47,14 +53,18 @@ public class UsualDockerCommandTests {
                 .withMemory(0L)
                 .withMemorySwap(0L)
                 .build();
-        Container container = ContainerBuilder.aContainer().withName("myContainer").withConfig(config).build();
+        Container container = ContainerBuilder.aContainer().withName(CONTAINER_NAME).withConfig(config).build();
         dockerClient.createContainer(container, DOCKER_HOST);
+        Assert.assertNotNull(dockerClient.findContainer(container, DOCKER_HOST).getId());
     }
 
     @Test
     public void test01_findContainer() throws DockerJSONException {
-        Container container = ContainerBuilder.aContainer().withName("myContainer").build();
+        Container container = ContainerBuilder.aContainer()
+                .withName("myContainer")
+                .build();
         dockerClient.findContainer(container, DOCKER_HOST);
+
     }
 
     @Test
@@ -69,14 +79,36 @@ public class UsualDockerCommandTests {
         Config config = ConfigBuilder.aConfig()
                 .withHostConfig(hostConfig)
                 .build();
-        Container container = ContainerBuilder.aContainer().withName("myContainer").withConfig(config).build();
+        Container container = ContainerBuilder.aContainer()
+                .withName(CONTAINER_NAME)
+                .withConfig(config).build();
         dockerClient.startContainer(container, DOCKER_HOST);
+        Assert.assertTrue(dockerClient.findContainer(container, DOCKER_HOST).getState().getRunning());
     }
 
     @Test
     public void test03_stopContainer() throws DockerJSONException {
-        Container container = ContainerBuilder.aContainer().withName("myContainer").build();
+        Container container = ContainerBuilder.aContainer()
+                .withName(CONTAINER_NAME)
+                .build();
         dockerClient.stopContainer(container, DOCKER_HOST);
+        Assert.assertFalse(dockerClient.findContainer(container, DOCKER_HOST).getState().getRunning());
+    }
+
+    @Test
+    public void test04_removeContainer() throws DockerJSONException {
+        Container container = ContainerBuilder.aContainer()
+                .withName(CONTAINER_NAME)
+                .build();
+        Assert.assertEquals(dockerClient.removeContainer(container, DOCKER_HOST).getStatus(), 204);
+    }
+
+    @Test
+    public void test05_findAllContainers() throws DockerJSONException {
+        Container container = ContainerBuilder.aContainer().
+                withName(CONTAINER_NAME)
+                .build();
+        Assert.assertEquals(dockerClient.findAllContainers(DOCKER_HOST).size(), RUNNING_CONTAINERS);
     }
 
 
