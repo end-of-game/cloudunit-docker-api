@@ -30,7 +30,7 @@ public class Container implements Serializable {
     private String execDriver;
 
     @JsonProperty("ExecIDs")
-    private String execIDs;
+    private List<String> execIDs;
 
     @JsonProperty("HostConfig")
     private HostConfig hostConfig;
@@ -144,11 +144,11 @@ public class Container implements Serializable {
         this.execDriver = execDriver;
     }
 
-    public String getExecIDs() {
+    public List<String> getExecIDs() {
         return execIDs;
     }
 
-    public void setExecIDs(String execIDs) {
+    public void setExecIDs(List<String> execIDs) {
         this.execIDs = execIDs;
     }
 

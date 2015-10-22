@@ -2,7 +2,11 @@ package fr.treeptik.cloudunit.docker.core;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.treeptik.cloudunit.docker.builders.ExecBodyBuilder;
+import fr.treeptik.cloudunit.docker.builders.ExecStartBodyBuilder;
 import fr.treeptik.cloudunit.docker.model.Container;
+import fr.treeptik.cloudunit.docker.model.ExecBody;
+import fr.treeptik.cloudunit.docker.model.ExecStartBody;
 import fr.treeptik.cloudunit.docker.model.Image;
 import fr.treeptik.cloudunit.dto.DockerResponse;
 import fr.treeptik.cloudunit.exception.DockerJSONException;
@@ -237,6 +241,39 @@ public class DockerClient {
             dockerResponse = driver.removeImageIntoRepository(image, host, registryHost);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    /**
+     * @param container
+     * @param commands
+     * @param host
+     * @return
+     * @throws DockerJSONException
+     */
+    public DockerResponse execCommand(Container container, List<String> commands, String host) throws DockerJSONException {
+        DockerResponse dockerResponse = null;
+        try {
+            ExecBody execBody = ExecBodyBuilder.anExecBody()
+                    .withCmd(commands)
+                    .withAttachStdin(Boolean.FALSE)
+                    .withAttachStdout(Boolean.TRUE)
+                    .withAttachStderr(Boolean.TRUE)
+                    .withTty(Boolean.FALSE)
+                    .build();
+            dockerResponse = driver.execCreate(container, execBody, host);
+            handleDockerAPIError(dockerResponse);
+            ExecStartBody execStartBody = ExecStartBodyBuilder
+                    .anExecStartBody()
+                    .withDetach(Boolean.FALSE)
+                    .withTty(Boolean.FALSE)
+                    .build();
+            execBody = objectMapper.readValue(dockerResponse.getBody(), ExecBody.class);
+            dockerResponse = driver.execStart(execBody.getId(), execStartBody, host);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException | IOException e) {
             throw new DockerJSONException(e.getMessage(), e);
         }
         return dockerResponse;

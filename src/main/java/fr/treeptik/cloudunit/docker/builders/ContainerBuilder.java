@@ -17,7 +17,7 @@ public class ContainerBuilder {
     private String created;
     private String driver;
     private String execDriver;
-    private String execIDs;
+    private List<String> execIDs;
     private HostConfig hostConfig;
     private String hostnamePath;
     private String hostsPath;
@@ -70,7 +70,7 @@ public class ContainerBuilder {
         return this;
     }
 
-    public ContainerBuilder withExecIDs(String execIDs) {
+    public ContainerBuilder withExecIDs(List<String> execIDs) {
         this.execIDs = execIDs;
         return this;
     }

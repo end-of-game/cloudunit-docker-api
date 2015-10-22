@@ -17,8 +17,11 @@
 
 package fr.treeptik.cloudunit.docker.core;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.treeptik.cloudunit.docker.model.Container;
+import fr.treeptik.cloudunit.docker.model.ExecBody;
+import fr.treeptik.cloudunit.docker.model.ExecStartBody;
 import fr.treeptik.cloudunit.docker.model.Image;
 import fr.treeptik.cloudunit.dto.DockerResponse;
 import fr.treeptik.cloudunit.exception.FatalDockerJSONException;
@@ -359,6 +362,55 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
             throw new FatalDockerJSONException("An error has occurred for removeImage request due to " + e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    @Override
+    public DockerResponse execCreate(Container container, ExecBody execBody, String host) throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
+                    .setPath("/containers/" + container.getConfig().getHostname() + "/exec")
+                    .build();
+            body = objectMapper.writeValueAsString(execBody);
+            dockerResponse = client.sendPost(uri, body, "application/json");
+        } catch (URISyntaxException | JSONClientException | JsonProcessingException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for kill container request due to " + e.getMessage(), e);
+        }
+
+        return dockerResponse;
+    }
+
+    @Override
+    public DockerResponse execStart(String execId, ExecStartBody execStartBody, String host) throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
+                    .setPath("/exec/" + execId + "/start")
+                    .build();
+            body = objectMapper.writeValueAsString(execStartBody);
+            dockerResponse = client.sendPost(uri, body, "application/vnd.docker.raw-stream");
+        } catch (URISyntaxException | JSONClientException | JsonProcessingException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for kill container request due to " + e.getMessage(), e);
         }
         return dockerResponse;
     }

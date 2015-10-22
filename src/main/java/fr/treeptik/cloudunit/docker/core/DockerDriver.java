@@ -1,6 +1,8 @@
 package fr.treeptik.cloudunit.docker.core;
 
 import fr.treeptik.cloudunit.docker.model.Container;
+import fr.treeptik.cloudunit.docker.model.ExecBody;
+import fr.treeptik.cloudunit.docker.model.ExecStartBody;
 import fr.treeptik.cloudunit.docker.model.Image;
 import fr.treeptik.cloudunit.dto.DockerResponse;
 import fr.treeptik.cloudunit.exception.FatalDockerJSONException;
@@ -46,6 +48,16 @@ public interface DockerDriver {
             throws FatalDockerJSONException;
 
     DockerResponse removeImageIntoRepository(Image image, String host, String registryHost)
+            throws FatalDockerJSONException;
+
+    /*
+    Advanced methods
+     */
+
+    DockerResponse execCreate(Container container, ExecBody execBody, String host)
+            throws FatalDockerJSONException;
+
+    DockerResponse execStart(String execId, ExecStartBody execStartBody, String host)
             throws FatalDockerJSONException;
 
 }
