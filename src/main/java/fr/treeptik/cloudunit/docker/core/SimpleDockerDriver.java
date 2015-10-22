@@ -19,6 +19,7 @@ package fr.treeptik.cloudunit.docker.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.treeptik.cloudunit.docker.model.Container;
+import fr.treeptik.cloudunit.docker.model.Image;
 import fr.treeptik.cloudunit.dto.DockerResponse;
 import fr.treeptik.cloudunit.exception.FatalDockerJSONException;
 import fr.treeptik.cloudunit.exception.JSONClientException;
@@ -216,6 +217,29 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
+    public DockerResponse findAnImage(Image image, String host) throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
+                    .setPath("/images/" + image.getName() + "/json")
+                    .build();
+            dockerResponse = client.sendGet(uri);
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for find a container request due to " + e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    @Override
     public DockerResponse commit(Container container, String host, String tag, String repository) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
@@ -254,7 +278,7 @@ public class SimpleDockerDriver implements DockerDriver {
                     .setParameter("tag", tag.toLowerCase()).build();
             dockerResponse = client.sendPostToRegistryHost(uri, "",
                     "application/json");
-            dockerResponse = client.sendPost(uri, "", "application/json");
+            dockerResponse = client.sendPostToRegistryHost(uri, "", "application/json");
         } catch (URISyntaxException | JSONClientException e) {
             StringBuilder contextError = new StringBuilder(256);
             contextError.append("uri : " + uri + " - ");
@@ -294,7 +318,7 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
-    public DockerResponse removeImage(String host, String tag, String repository)
+    public DockerResponse removeImage(Image image, String host)
             throws FatalDockerJSONException {
 
         URI uri = null;
@@ -302,7 +326,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder().setScheme("http").setHost(host)
-                    .setPath("/images/" + repository + tag).build();
+                    .setPath("/images/" + image.getId()).build();
             dockerResponse = client.sendDelete(uri);
         } catch (URISyntaxException | JSONClientException e) {
             StringBuilder contextError = new StringBuilder(256);
@@ -316,7 +340,7 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
-    public DockerResponse removeImageIntoRepository(String host, String tag, String repository)
+    public DockerResponse removeImageIntoRepository(Image image, String host, String registryHost)
             throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
@@ -324,10 +348,9 @@ public class SimpleDockerDriver implements DockerDriver {
         try {
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(repository)
+                    .setHost(registryHost)
                     .setPath(
-                            "/v1/repositories/" + repository + "/tags/"
-                                    + tag.toLowerCase()).build();
+                            "/v1/repositories/" + image.getId()).build();
             dockerResponse = client.sendDelete(uri);
         } catch (URISyntaxException | JSONClientException e) {
             StringBuilder contextError = new StringBuilder(256);

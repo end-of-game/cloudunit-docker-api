@@ -1,6 +1,7 @@
 package fr.treeptik.cloudunit.docker.core;
 
 import fr.treeptik.cloudunit.docker.model.Container;
+import fr.treeptik.cloudunit.docker.model.Image;
 import fr.treeptik.cloudunit.dto.DockerResponse;
 import fr.treeptik.cloudunit.exception.FatalDockerJSONException;
 
@@ -30,6 +31,8 @@ public interface DockerDriver {
     Usual methods to manipulate images and registry
      */
 
+    DockerResponse findAnImage(Image image, String host) throws FatalDockerJSONException;
+
     DockerResponse commit(Container container, String host, String tag, String repository)
             throws FatalDockerJSONException;
 
@@ -39,10 +42,10 @@ public interface DockerDriver {
     DockerResponse pull(String host, String tag, String repository)
             throws FatalDockerJSONException;
 
-    DockerResponse removeImage(String host, String tag, String repository)
+    DockerResponse removeImage(Image image, String host)
             throws FatalDockerJSONException;
 
-    DockerResponse removeImageIntoRepository(String host, String tag, String repository)
+    DockerResponse removeImageIntoRepository(Image image, String host, String registryHost)
             throws FatalDockerJSONException;
 
 }

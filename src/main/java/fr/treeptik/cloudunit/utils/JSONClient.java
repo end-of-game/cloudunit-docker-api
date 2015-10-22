@@ -110,12 +110,12 @@ public class JSONClient {
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
         RequestConfig config = RequestConfig.custom()
-                .setSocketTimeout(1000 * 60 * 5)
-                .setConnectTimeout(1000 * 60 * 5).build();
+                .setSocketTimeout(1000 * 60 * 50)
+                .setConnectTimeout(1000 * 60 * 50).build();
         HttpPost httpPost = new HttpPost(uri);
         httpPost.setConfig(config);
         httpPost.addHeader("content-type", contentType);
-        httpPost.addHeader("X-Registry-Auth", "1234");
+        httpPost.addHeader("X-Registry-Auth", "123");
         HttpResponse response = null;
         StringWriter writer = new StringWriter();
         try {

@@ -26,7 +26,7 @@ public class ContainerCommandTests {
     private static DockerClient dockerClient;
     private static final String DOCKER_HOST = "192.168.50.4:4243";
     private static final String CONTAINER_NAME = "myContainer";
-    private static final int RUNNING_CONTAINERS = 8;
+    private final int RUNNING_CONTAINERS = 8;
 
     @BeforeClass
     public static void setup() {
