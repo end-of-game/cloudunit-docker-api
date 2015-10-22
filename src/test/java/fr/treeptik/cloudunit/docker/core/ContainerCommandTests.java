@@ -7,7 +7,10 @@ import fr.treeptik.cloudunit.docker.model.Config;
 import fr.treeptik.cloudunit.docker.model.Container;
 import fr.treeptik.cloudunit.docker.model.HostConfig;
 import fr.treeptik.cloudunit.exception.DockerJSONException;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import java.util.ArrayList;
@@ -18,7 +21,7 @@ import java.util.HashMap;
  * Created by guillaume on 21/10/15.
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class UsualDockerCommandTests {
+public class ContainerCommandTests {
 
     private static DockerClient dockerClient;
     private static final String DOCKER_HOST = "192.168.50.4:4243";
@@ -30,10 +33,6 @@ public class UsualDockerCommandTests {
         dockerClient = new DockerClient();
     }
 
-    @AfterClass
-    public static void tearDown() {
-
-    }
 
     @Test
     public void test00_createContainer() throws DockerJSONException {

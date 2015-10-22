@@ -152,17 +152,70 @@ public class DockerClient {
     }
 
     /**
-     * @param container
      * @param host
      * @param tag
      * @param repository
      * @return
      * @throws DockerJSONException
      */
-    public DockerResponse pushImage(Container container, String host, String tag, String repository) throws DockerJSONException {
+    public DockerResponse pushImage(String host, String tag, String repository) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
-            dockerResponse = driver.push(container, host, tag, repository);
+            dockerResponse = driver.push(host, tag, repository);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    /**
+     * @param host
+     * @param tag
+     * @param repository
+     * @return
+     * @throws DockerJSONException
+     */
+    public DockerResponse pullImage(String host, String tag, String repository) throws DockerJSONException {
+        DockerResponse dockerResponse = null;
+        try {
+            dockerResponse = driver.pull(host, tag, repository);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    /**
+     * @param host
+     * @param tag
+     * @param repository
+     * @return
+     * @throws DockerJSONException
+     */
+    public DockerResponse removeImage(String host, String tag, String repository) throws DockerJSONException {
+        DockerResponse dockerResponse = null;
+        try {
+            dockerResponse = driver.removeImage(host, tag, repository);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    /**
+     * @param host
+     * @param tag
+     * @param repository
+     * @return
+     * @throws DockerJSONException
+     */
+    public DockerResponse removeImageIntoTheRegistry(String host, String tag, String repository) throws DockerJSONException {
+        DockerResponse dockerResponse = null;
+        try {
+            dockerResponse = driver.removeImageIntoRepository(host, tag, repository);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
             throw new DockerJSONException(e.getMessage(), e);

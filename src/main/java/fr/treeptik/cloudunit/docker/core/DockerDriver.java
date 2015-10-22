@@ -33,7 +33,16 @@ public interface DockerDriver {
     DockerResponse commit(Container container, String host, String tag, String repository)
             throws FatalDockerJSONException;
 
-    DockerResponse push(Container container, String host, String tag, String repository)
+    DockerResponse push(String host, String tag, String repository)
+            throws FatalDockerJSONException;
+
+    DockerResponse pull(String host, String tag, String repository)
+            throws FatalDockerJSONException;
+
+    DockerResponse removeImage(String host, String tag, String repository)
+            throws FatalDockerJSONException;
+
+    DockerResponse removeImageIntoRepository(String host, String tag, String repository)
             throws FatalDockerJSONException;
 
 }

@@ -58,7 +58,7 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for find a container request due to " + e.getMessage(), e);
         }
 
         return dockerResponse;
@@ -82,7 +82,7 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for find all containers request due to " + e.getMessage(), e);
         }
 
         return dockerResponse;
@@ -135,7 +135,7 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for start container request due to " + e.getMessage(), e);
         }
         return dockerResponse;
     }
@@ -161,7 +161,7 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for stop container request due to " + e.getMessage(), e);
         }
         return dockerResponse;
     }
@@ -184,7 +184,7 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for kill container request due to " + e.getMessage(), e);
         }
         return dockerResponse;
     }
@@ -210,7 +210,7 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for remove request due to " + e.getMessage(), e);
         }
         return dockerResponse;
     }
@@ -236,13 +236,13 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for commit request due to " + e.getMessage(), e);
         }
         return dockerResponse;
     }
 
     @Override
-    public DockerResponse push(Container container, String host, String tag, String repository) throws FatalDockerJSONException {
+    public DockerResponse push(String host, String tag, String repository) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
@@ -261,192 +261,83 @@ public class SimpleDockerDriver implements DockerDriver {
             contextError.append("request body : " + body + " - ");
             contextError.append("server response : " + dockerResponse);
             logger.error(contextError.toString());
-            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+            throw new FatalDockerJSONException("An error has occurred for push request due to " + e.getMessage(), e);
         }
         return dockerResponse;
     }
 
-
-/**
-
-
- public String push(String name, String tag, String hostIp)
- throws DockerJSONException {
- URI uri = null;
- Map<String, Object> response = null;
- try {
- uri = new URIBuilder().setScheme("http").setHost(hostIp)
- .setPath("/images/" + name.toLowerCase() + "/push")
- .setParameter("tag", tag.toLowerCase()).build();
- response = client.sendPostWithRegistryHost(uri, "",
- "application/json");
- int statusCode = (int) response.get("code");
-
- switch (statusCode) {
- case 304:
- throw new WarningDockerJSONException(
- "container already stopped");
- case 404:
- throw new ErrorDockerJSONException("docker : no such container");
- case 500:
- throw new ErrorDockerJSONException("docker : server error");
- }
- } catch (URISyntaxException | WarningDockerJSONException
- | ErrorDockerJSONException | IOException e) {
- StringBuilder msgError = new StringBuilder(256);
- msgError.append(name.toLowerCase()).append(",hostIP=")
- .append(hostIp).append(",uri=").append(uri);
- logger.error(msgError.toString(), e);
- throw new FatalDockerJSONException("docker : error fatal");
- }
-
- logger.info((String) response.get("body"));
-
- return (String) response.get("body");
-
- }
-
- public String pull(String name, String tag, String hostIp)
- throws DockerJSONException {
- URI uri = null;
- Map<String, Object> response = null;
- try {
- uri = new URIBuilder().setScheme("http").setHost(hostIp)
- .setPath("/images/create")
- .setParameter("fromImage", name.toLowerCase())
- .setParameter("tag", tag.toLowerCase()).build();
- response = client.sendPostWithRegistryHost(uri, "",
- "application/json");
- int statusCode = (int) response.get("code");
-
- switch (statusCode) {
- case 304:
- throw new WarningDockerJSONException(
- "container already stopped");
- case 404:
- throw new ErrorDockerJSONException("docker : no such container");
- case 500:
- throw new ErrorDockerJSONException("docker : server error");
- }
- } catch (URISyntaxException | WarningDockerJSONException
- | ErrorDockerJSONException | IOException e) {
- StringBuilder msgError = new StringBuilder(256);
- msgError.append(name.toLowerCase()).append(",hostIP=")
- .append(hostIp).append(",uri=").append(uri);
- logger.error(msgError.toString(), e);
- throw new FatalDockerJSONException("docker : error fatal");
- }
-
- logger.info((String) response.get("body"));
-
- return (String) response.get("body");
-
- }
-
- public void deleteImage(String id, String hostIp)
- throws DockerJSONException {
- URI uri = null;
- try {
- uri = new URIBuilder().setScheme("http").setHost(hostIp)
- .setPath("/images/" + id).build();
- int statusCode = client.sendDelete(uri);
- switch (statusCode) {
- case 304:
- throw new WarningDockerJSONException(
- "container already stopped");
- case 404:
- throw new ErrorDockerJSONException("docker : no such container");
- case 500:
- throw new ErrorDockerJSONException("docker : server error");
- }
- } catch (URISyntaxException | WarningDockerJSONException
- | ErrorDockerJSONException | IOException e) {
- StringBuilder msgError = new StringBuilder(256);
- msgError.append(id).append(",hostIP=").append(hostIp)
- .append(",uri=").append(uri);
- logger.error(msgError.toString(), e);
- throw new FatalDockerJSONException("docker : error fatal");
- }
- }
-
- /**
- * @param registryIP
- * @param tag
- * @param repository
- * @return
- * @throws DockerJSONException
- * @throws ParseException      Appels à la registry docker pour la suppression des
- *                             containers liés au snapshot
- */
-    /*
-    public void deleteImageIntoTheRegistry(String registryIP, String tag,
-                                           String repository)
-            throws DockerJSONException {
+    @Override
+    public DockerResponse pull(String host, String tag, String repository) throws FatalDockerJSONException {
         URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
         try {
-
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(registryIP)
+                    .setHost(host)
+                    .setPath("/images/create")
+                    .setParameter("fromImage", repository + tag)
+                    .setParameter("tag", tag.toLowerCase())
+                    .build();
+            dockerResponse = client.sendPostToRegistryHost(uri, "",
+                    "application/json");
+            dockerResponse = client.sendPost(uri, "", "application/json");
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for pull request due to " + e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    @Override
+    public DockerResponse removeImage(String host, String tag, String repository)
+            throws FatalDockerJSONException {
+
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder().setScheme("http").setHost(host)
+                    .setPath("/images/" + repository + tag).build();
+            dockerResponse = client.sendDelete(uri);
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for removeImage request due to " + e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    @Override
+    public DockerResponse removeImageIntoRepository(String host, String tag, String repository)
+            throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(repository)
                     .setPath(
                             "/v1/repositories/" + repository + "/tags/"
                                     + tag.toLowerCase()).build();
-            int statusCode = client.sendDelete(uri);
-            switch (statusCode) {
-                case 401:
-                    throw new WarningDockerJSONException("Requires authorization");
-                case 404:
-                    throw new ErrorDockerJSONException("docker : Tag not found : "
-                            + tag);
-                case 500:
-                    throw new ErrorDockerJSONException("docker : server error");
-            }
-        } catch (URISyntaxException | WarningDockerJSONException
-                | ErrorDockerJSONException | IOException e) {
-            StringBuilder msgError = new StringBuilder(256);
-            msgError.append(tag.toLowerCase()).append(",hostIP=")
-                    .append(registryIP).append(",uri=").append(uri);
-            logger.error(msgError.toString(), e);
-            throw new FatalDockerJSONException("docker : error fatal");
+            dockerResponse = client.sendDelete(uri);
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for removeImage request due to " + e.getMessage(), e);
         }
+        return dockerResponse;
     }
 
-    public Integer getARandomHostPorts(String hostIp) {
-        int port = randPort(2599, 2900);
-
-        // on supprime tous les ports ouverts de forbiddenPorts car ils ne sont
-        // plus succeptibles de déclencher une erreur
-        if (!forbbidenPorts.isEmpty()) {
-            forbbidenPorts.stream().filter(t -> isPortOpened(hostIp, t))
-                    .forEach(t -> forbbidenPorts.remove(t));
-        }
-
-        if (isPortOpened(hostIp, port) | forbbidenPorts.contains(port)) {
-            port = getARandomHostPorts(hostIp);
-        }
-        // on ajoute le port à la liste des ports à ne pas ouvrir tant que
-        // l'opération n'est pas terminée
-        forbbidenPorts.add(port);
-
-        return port;
-    }
-
-    private boolean isPortOpened(String ip, Integer port) {
-        try {
-            Socket socket = new Socket();
-            socket.connect(new InetSocketAddress(ip, port), 500);
-            socket.close();
-            return true;
-        } catch (Exception ex) {
-            return false;
-        }
-    }
-
-    private int randPort(int min, int max) {
-        Random rand = new Random();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
-        return randomNum;
-    }
-
-    */
 }
