@@ -96,7 +96,17 @@ public class UsualDockerCommandTests {
     }
 
     @Test
-    public void test04_removeContainer() throws DockerJSONException {
+    public void test04_killContainer() throws DockerJSONException {
+        Container container = ContainerBuilder.aContainer()
+                .withName(CONTAINER_NAME)
+                .build();
+        container = dockerClient.findContainer(container, DOCKER_HOST);
+        dockerClient.startContainer(container, DOCKER_HOST);
+        Assert.assertFalse(dockerClient.findContainer(container, DOCKER_HOST).getState().getRunning());
+    }
+
+    @Test
+    public void test05_removeContainer() throws DockerJSONException {
         Container container = ContainerBuilder.aContainer()
                 .withName(CONTAINER_NAME)
                 .build();
@@ -104,11 +114,11 @@ public class UsualDockerCommandTests {
     }
 
     @Test
-    public void test05_findAllContainers() throws DockerJSONException {
+    public void test06_findAllContainers() throws DockerJSONException {
         Container container = ContainerBuilder.aContainer().
                 withName(CONTAINER_NAME)
                 .build();
-        Assert.assertEquals(dockerClient.findAllContainers(DOCKER_HOST).size(), RUNNING_CONTAINERS);
+        Assert.assertEquals(RUNNING_CONTAINERS, dockerClient.findAllContainers(DOCKER_HOST).size());
     }
 
 

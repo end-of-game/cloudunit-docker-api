@@ -41,14 +41,14 @@ public class SimpleDockerDriver implements DockerDriver {
 
 
     @Override
-    public DockerResponse find(Container container, String hostIp) throws FatalDockerJSONException {
+    public DockerResponse find(Container container, String host) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(hostIp)
+                    .setHost(host)
                     .setPath("/containers/" + container.getName() + "/json")
                     .build();
             dockerResponse = client.sendGet(uri);
@@ -65,14 +65,14 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
-    public DockerResponse findAll(String hostIp) throws FatalDockerJSONException {
+    public DockerResponse findAll(String host) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(hostIp)
+                    .setHost(host)
                     .setPath("/containers/json")
                     .build();
             dockerResponse = client.sendGet(uri);
@@ -89,19 +89,18 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
-    public DockerResponse create(Container container, String hostIp) throws FatalDockerJSONException {
+    public DockerResponse create(Container container, String host) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(hostIp)
+                    .setHost(host)
                     .setPath("/containers/create")
                     .setParameter("name", container.getName())
                     .build();
             body = objectMapper.writeValueAsString(container.getConfig());
-            logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri, body, "application/json");
         } catch (URISyntaxException | IOException | JSONClientException e) {
             StringBuilder contextError = new StringBuilder(256);
@@ -115,20 +114,19 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
-    public DockerResponse start(Container container, String hostIp) throws FatalDockerJSONException {
+    public DockerResponse start(Container container, String host) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(hostIp)
+                    .setHost(host)
                     .setPath(
                             "/containers/" + container.getName()
                                     + "/start")
                     .build();
             body = objectMapper.writeValueAsString(container.getConfig().getHostConfig());
-            logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri,
                     body, "application/json");
         } catch (URISyntaxException | IOException | JSONClientException e) {
@@ -143,19 +141,18 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
-    public DockerResponse stop(Container container, String hostIp) throws FatalDockerJSONException {
+    public DockerResponse stop(Container container, String host) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(hostIp)
+                    .setHost(host)
                     .setPath(
                             "/containers/" + container.getName()
                                     + "/stop")
                     .build();
-            logger.debug("body = " + body);
             dockerResponse = client.sendPost(uri,
                     body, "application/json");
         } catch (URISyntaxException | JSONClientException e) {
@@ -170,20 +167,42 @@ public class SimpleDockerDriver implements DockerDriver {
     }
 
     @Override
-    public DockerResponse remove(Container container, String hostIp) throws FatalDockerJSONException {
+    public DockerResponse kill(Container container, String host) throws FatalDockerJSONException {
         URI uri = null;
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
                     .setScheme("http")
-                    .setHost(hostIp)
+                    .setHost(host)
+                    .setPath("/containers/" + container.getName() + "/kill")
+                    .build();
+            dockerResponse = client.sendPost(uri, "", "application/json");
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    @Override
+    public DockerResponse remove(Container container, String host) throws FatalDockerJSONException {
+        URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
+        try {
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
                     .setPath("/containers/" + container.getName())
                     .setParameter("v", "1")
                     .setParameter("force",
                             "true")
                     .build();
-            logger.debug("body = " + body);
             dockerResponse = client.sendDelete(uri);
         } catch (URISyntaxException | JSONClientException e) {
             StringBuilder contextError = new StringBuilder(256);
@@ -195,176 +214,170 @@ public class SimpleDockerDriver implements DockerDriver {
         }
         return dockerResponse;
     }
-/*
 
-    public void kill(String name, String hostIp)
-            throws DockerJSONException {
+    @Override
+    public DockerResponse commit(Container container, String host, String tag, String repository) throws FatalDockerJSONException {
         URI uri = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
         try {
-            uri = new URIBuilder().setScheme("http").setHost(hostIp)
-                    .setPath("/containers/" + name + "/kill").build();
-            int statusCode = client.sendPost(uri, "", "application/json");
-            switch (statusCode) {
-                case 304:
-                    throw new WarningDockerJSONException(
-                            "container already stopped");
-                case 404:
-                    throw new ErrorDockerJSONException("docker : no such container");
-                case 500:
-                    throw new ErrorDockerJSONException("docker : server error");
-            }
-
-        } catch (URISyntaxException | IOException e) {
-            StringBuilder msgError = new StringBuilder(256);
-            msgError.append(name).append(",hostIP=").append(hostIp)
-                    .append(",uri=").append(uri);
-            logger.error(msgError.toString(), e);
-            throw new FatalDockerJSONException("docker : error fatal");
-        }
-    }
-
-    public String commit(String name, String tag, String hostIp, String repo)
-            throws DockerJSONException {
-        URI uri = null;
-        Map<String, Object> response = null;
-        try {
-            uri = new URIBuilder().setScheme("http").setHost(hostIp)
-                    .setPath("/commit").setParameter("container", name)
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
+                    .setPath("/commit")
+                    .setParameter("container", container.getName())
                     .setParameter("tag", tag)
-                    .setParameter("repo", "localhost:5000/" + repo + tag)
+                    .setParameter("repo", repository + tag)
                     .build();
-            response = client
-                    .sendPostAndGetImageID(uri, "", "application/json");
-            int statusCode = (int) response.get("code");
-            switch (statusCode) {
-                case 304:
-                    throw new WarningDockerJSONException(
-                            "container already stopped");
-                case 404:
-                    throw new ErrorDockerJSONException("docker : no such container");
-                case 500:
-                    throw new ErrorDockerJSONException("docker : server error");
-            }
-        } catch (URISyntaxException | WarningDockerJSONException
-                | ErrorDockerJSONException | IOException e) {
-            StringBuilder msgError = new StringBuilder(256);
-            msgError.append(name).append(",hostIP=").append(hostIp)
-                    .append(",uri=").append(uri);
-            logger.error(msgError.toString(), e);
-            throw new FatalDockerJSONException("docker : error fatal");
+            dockerResponse = client.sendPost(uri, "", "application/json");
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
         }
-
-        return (String) response.get("body");
+        return dockerResponse;
     }
 
-    public String push(String name, String tag, String hostIp)
-            throws DockerJSONException {
+    @Override
+    public DockerResponse push(Container container, String host, String tag, String repository) throws FatalDockerJSONException {
         URI uri = null;
-        Map<String, Object> response = null;
+        String body = new String();
+        DockerResponse dockerResponse = null;
         try {
-            uri = new URIBuilder().setScheme("http").setHost(hostIp)
-                    .setPath("/images/" + name.toLowerCase() + "/push")
+            uri = new URIBuilder()
+                    .setScheme("http")
+                    .setHost(host)
+                    .setPath("/images/" + repository + tag + "/push")
                     .setParameter("tag", tag.toLowerCase()).build();
-            response = client.sendPostWithRegistryHost(uri, "",
+            dockerResponse = client.sendPostToRegistryHost(uri, "",
                     "application/json");
-            int statusCode = (int) response.get("code");
-
-            switch (statusCode) {
-                case 304:
-                    throw new WarningDockerJSONException(
-                            "container already stopped");
-                case 404:
-                    throw new ErrorDockerJSONException("docker : no such container");
-                case 500:
-                    throw new ErrorDockerJSONException("docker : server error");
-            }
-        } catch (URISyntaxException | WarningDockerJSONException
-                | ErrorDockerJSONException | IOException e) {
-            StringBuilder msgError = new StringBuilder(256);
-            msgError.append(name.toLowerCase()).append(",hostIP=")
-                    .append(hostIp).append(",uri=").append(uri);
-            logger.error(msgError.toString(), e);
-            throw new FatalDockerJSONException("docker : error fatal");
+            dockerResponse = client.sendPost(uri, "", "application/json");
+        } catch (URISyntaxException | JSONClientException e) {
+            StringBuilder contextError = new StringBuilder(256);
+            contextError.append("uri : " + uri + " - ");
+            contextError.append("request body : " + body + " - ");
+            contextError.append("server response : " + dockerResponse);
+            logger.error(contextError.toString());
+            throw new FatalDockerJSONException("An error has occurred for create container request due to " + e.getMessage(), e);
         }
-
-        logger.info((String) response.get("body"));
-
-        return (String) response.get("body");
-
+        return dockerResponse;
     }
 
-    public String pull(String name, String tag, String hostIp)
-            throws DockerJSONException {
-        URI uri = null;
-        Map<String, Object> response = null;
-        try {
-            uri = new URIBuilder().setScheme("http").setHost(hostIp)
-                    .setPath("/images/create")
-                    .setParameter("fromImage", name.toLowerCase())
-                    .setParameter("tag", tag.toLowerCase()).build();
-            response = client.sendPostWithRegistryHost(uri, "",
-                    "application/json");
-            int statusCode = (int) response.get("code");
 
-            switch (statusCode) {
-                case 304:
-                    throw new WarningDockerJSONException(
-                            "container already stopped");
-                case 404:
-                    throw new ErrorDockerJSONException("docker : no such container");
-                case 500:
-                    throw new ErrorDockerJSONException("docker : server error");
-            }
-        } catch (URISyntaxException | WarningDockerJSONException
-                | ErrorDockerJSONException | IOException e) {
-            StringBuilder msgError = new StringBuilder(256);
-            msgError.append(name.toLowerCase()).append(",hostIP=")
-                    .append(hostIp).append(",uri=").append(uri);
-            logger.error(msgError.toString(), e);
-            throw new FatalDockerJSONException("docker : error fatal");
-        }
+/**
 
-        logger.info((String) response.get("body"));
 
-        return (String) response.get("body");
+ public String push(String name, String tag, String hostIp)
+ throws DockerJSONException {
+ URI uri = null;
+ Map<String, Object> response = null;
+ try {
+ uri = new URIBuilder().setScheme("http").setHost(hostIp)
+ .setPath("/images/" + name.toLowerCase() + "/push")
+ .setParameter("tag", tag.toLowerCase()).build();
+ response = client.sendPostWithRegistryHost(uri, "",
+ "application/json");
+ int statusCode = (int) response.get("code");
 
-    }
+ switch (statusCode) {
+ case 304:
+ throw new WarningDockerJSONException(
+ "container already stopped");
+ case 404:
+ throw new ErrorDockerJSONException("docker : no such container");
+ case 500:
+ throw new ErrorDockerJSONException("docker : server error");
+ }
+ } catch (URISyntaxException | WarningDockerJSONException
+ | ErrorDockerJSONException | IOException e) {
+ StringBuilder msgError = new StringBuilder(256);
+ msgError.append(name.toLowerCase()).append(",hostIP=")
+ .append(hostIp).append(",uri=").append(uri);
+ logger.error(msgError.toString(), e);
+ throw new FatalDockerJSONException("docker : error fatal");
+ }
 
-    public void deleteImage(String id, String hostIp)
-            throws DockerJSONException {
-        URI uri = null;
-        try {
-            uri = new URIBuilder().setScheme("http").setHost(hostIp)
-                    .setPath("/images/" + id).build();
-            int statusCode = client.sendDelete(uri);
-            switch (statusCode) {
-                case 304:
-                    throw new WarningDockerJSONException(
-                            "container already stopped");
-                case 404:
-                    throw new ErrorDockerJSONException("docker : no such container");
-                case 500:
-                    throw new ErrorDockerJSONException("docker : server error");
-            }
-        } catch (URISyntaxException | WarningDockerJSONException
-                | ErrorDockerJSONException | IOException e) {
-            StringBuilder msgError = new StringBuilder(256);
-            msgError.append(id).append(",hostIP=").append(hostIp)
-                    .append(",uri=").append(uri);
-            logger.error(msgError.toString(), e);
-            throw new FatalDockerJSONException("docker : error fatal");
-        }
-    }
+ logger.info((String) response.get("body"));
 
-    /**
-     * @param registryIP
-     * @param tag
-     * @param repository
-     * @return
-     * @throws DockerJSONException
-     * @throws ParseException      Appels à la registry docker pour la suppression des
-     *                             containers liés au snapshot
-     */
+ return (String) response.get("body");
+
+ }
+
+ public String pull(String name, String tag, String hostIp)
+ throws DockerJSONException {
+ URI uri = null;
+ Map<String, Object> response = null;
+ try {
+ uri = new URIBuilder().setScheme("http").setHost(hostIp)
+ .setPath("/images/create")
+ .setParameter("fromImage", name.toLowerCase())
+ .setParameter("tag", tag.toLowerCase()).build();
+ response = client.sendPostWithRegistryHost(uri, "",
+ "application/json");
+ int statusCode = (int) response.get("code");
+
+ switch (statusCode) {
+ case 304:
+ throw new WarningDockerJSONException(
+ "container already stopped");
+ case 404:
+ throw new ErrorDockerJSONException("docker : no such container");
+ case 500:
+ throw new ErrorDockerJSONException("docker : server error");
+ }
+ } catch (URISyntaxException | WarningDockerJSONException
+ | ErrorDockerJSONException | IOException e) {
+ StringBuilder msgError = new StringBuilder(256);
+ msgError.append(name.toLowerCase()).append(",hostIP=")
+ .append(hostIp).append(",uri=").append(uri);
+ logger.error(msgError.toString(), e);
+ throw new FatalDockerJSONException("docker : error fatal");
+ }
+
+ logger.info((String) response.get("body"));
+
+ return (String) response.get("body");
+
+ }
+
+ public void deleteImage(String id, String hostIp)
+ throws DockerJSONException {
+ URI uri = null;
+ try {
+ uri = new URIBuilder().setScheme("http").setHost(hostIp)
+ .setPath("/images/" + id).build();
+ int statusCode = client.sendDelete(uri);
+ switch (statusCode) {
+ case 304:
+ throw new WarningDockerJSONException(
+ "container already stopped");
+ case 404:
+ throw new ErrorDockerJSONException("docker : no such container");
+ case 500:
+ throw new ErrorDockerJSONException("docker : server error");
+ }
+ } catch (URISyntaxException | WarningDockerJSONException
+ | ErrorDockerJSONException | IOException e) {
+ StringBuilder msgError = new StringBuilder(256);
+ msgError.append(id).append(",hostIP=").append(hostIp)
+ .append(",uri=").append(uri);
+ logger.error(msgError.toString(), e);
+ throw new FatalDockerJSONException("docker : error fatal");
+ }
+ }
+
+ /**
+ * @param registryIP
+ * @param tag
+ * @param repository
+ * @return
+ * @throws DockerJSONException
+ * @throws ParseException      Appels à la registry docker pour la suppression des
+ *                             containers liés au snapshot
+ */
     /*
     public void deleteImageIntoTheRegistry(String registryIP, String tag,
                                            String repository)

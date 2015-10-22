@@ -26,13 +26,13 @@ public class DockerClient {
 
     /**
      * @param container
-     * @param hostIp
+     * @param host
      * @return
      * @throws DockerJSONException
      */
-    public Container findContainer(Container container, String hostIp) throws DockerJSONException {
+    public Container findContainer(Container container, String host) throws DockerJSONException {
         try {
-            DockerResponse dockerResponse = driver.find(container, hostIp);
+            DockerResponse dockerResponse = driver.find(container, host);
             logger.debug(dockerResponse.getBody());
             handleDockerAPIError(dockerResponse);
             container = objectMapper.readValue(dockerResponse.getBody(), Container.class);
@@ -43,14 +43,14 @@ public class DockerClient {
     }
 
     /**
-     * @param hostIp
+     * @param host
      * @return
      * @throws DockerJSONException
      */
-    public List<Container> findAllContainers(String hostIp) throws DockerJSONException {
+    public List<Container> findAllContainers(String host) throws DockerJSONException {
         List<Container> containers = null;
         try {
-            DockerResponse dockerResponse = driver.findAll(hostIp);
+            DockerResponse dockerResponse = driver.findAll(host);
             logger.debug(dockerResponse.getBody());
             handleDockerAPIError(dockerResponse);
             containers = objectMapper.readValue(dockerResponse.getBody(),
@@ -64,12 +64,12 @@ public class DockerClient {
 
     /**
      * @param container
-     * @param hostIp
+     * @param host
      * @throws DockerJSONException
      */
-    public void createContainer(Container container, String hostIp) throws DockerJSONException {
+    public void createContainer(Container container, String host) throws DockerJSONException {
         try {
-            DockerResponse dockerResponse = driver.create(container, hostIp);
+            DockerResponse dockerResponse = driver.create(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
             throw new DockerJSONException(e.getMessage(), e);
@@ -78,12 +78,12 @@ public class DockerClient {
 
     /**
      * @param container
-     * @param hostIp
+     * @param host
      * @throws DockerJSONException
      */
-    public void startContainer(Container container, String hostIp) throws DockerJSONException {
+    public void startContainer(Container container, String host) throws DockerJSONException {
         try {
-            DockerResponse dockerResponse = driver.start(container, hostIp);
+            DockerResponse dockerResponse = driver.start(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
             throw new DockerJSONException(e.getMessage(), e);
@@ -92,28 +92,77 @@ public class DockerClient {
 
     /**
      * @param container
-     * @param hostIp
+     * @param host
      * @throws DockerJSONException
      */
-    public void stopContainer(Container container, String hostIp) throws DockerJSONException {
+    public void stopContainer(Container container, String host) throws DockerJSONException {
         try {
-            DockerResponse dockerResponse = driver.stop(container, hostIp);
+            DockerResponse dockerResponse = driver.stop(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
             throw new DockerJSONException(e.getMessage(), e);
         }
     }
 
+    public DockerResponse killContainer(Container container, String host) throws DockerJSONException {
+        DockerResponse dockerResponse = null;
+        try {
+            dockerResponse = driver.kill(container, host);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
     /**
      * @param container
-     * @param hostIp
+     * @param host
      * @return
      * @throws DockerJSONException
      */
-    public DockerResponse removeContainer(Container container, String hostIp) throws DockerJSONException {
+    public DockerResponse removeContainer(Container container, String host) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
-            dockerResponse = driver.remove(container, hostIp);
+            dockerResponse = driver.remove(container, host);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    /**
+     * @param container
+     * @param host
+     * @param tag
+     * @param repository
+     * @return
+     * @throws DockerJSONException
+     */
+    public DockerResponse commitImage(Container container, String host, String tag, String repository) throws DockerJSONException {
+        DockerResponse dockerResponse = null;
+        try {
+            dockerResponse = driver.commit(container, host, tag, repository);
+            handleDockerAPIError(dockerResponse);
+        } catch (FatalDockerJSONException e) {
+            throw new DockerJSONException(e.getMessage(), e);
+        }
+        return dockerResponse;
+    }
+
+    /**
+     * @param container
+     * @param host
+     * @param tag
+     * @param repository
+     * @return
+     * @throws DockerJSONException
+     */
+    public DockerResponse pushImage(Container container, String host, String tag, String repository) throws DockerJSONException {
+        DockerResponse dockerResponse = null;
+        try {
+            dockerResponse = driver.push(container, host, tag, repository);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
             throw new DockerJSONException(e.getMessage(), e);
