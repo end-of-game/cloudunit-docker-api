@@ -1,24 +1,41 @@
-# CLOUDUNIT DOCKER CLIENT
+# CloudUnit Docker Client
 
-# Context
+## Context
 
-CloudUnit uses an internal docker API. 
+This project provides some Java methods to drive Docker API.
+It is based on Docker API 1.18 (Docker server 1.6.2). The main Docker commands to manage containers,
+images and run exec commands are available. It will be used into the next Cloudunit version. But you can easily use it
+for your own projects using Docker
 
-Not easy to test when Docker changes its json structure.
+## Requirements
 
-# Goal
+- Docker engine 1.6.2
+- Maven 3.X +
 
-Goal of this library is :
-* to separate docker concepts and CloudUnit business logic
-* add unit tests
-* add integration tests
+## How it works
 
-# Target
+- Clone the project and install it on your local .m2 repository with Maven :
 
-Release a jar to include into CloudUnitManager (main project)
+```bash
+git clone git@github.com:Treeptik/cloudunit-docker-api.git
+cd cloudunit-docker-api
+mvn clean install
+```
 
-# Warning
+- Then, import the dependency in your project's pom.xml :
 
-Do not use it because just a copy from CloudUnit Manager without spring dependencies.
+```xml
+<dependency>
+    <groupId>fr.treeptik</groupId>
+    <artifactId>cloudunit-docker-client</artifactId>
+    <version>1.0</version>
+</dependency>
+```
 
-**Full internal rewrite in progress**
+- All commands are provided by DockerClient class. You will find some examples in test directories
+
+## What's next?
+
+- Supports all available commands
+- Upgrade to Docker Engine 1.8
+

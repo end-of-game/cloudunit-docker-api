@@ -83,7 +83,8 @@ public class AdvancedCommandTests {
                 .withName("myContainer")
                 .build();
         container = dockerClient.findContainer(container, DOCKER_HOST);
-        Assert.assertTrue(dockerClient.execCommand(container, Arrays.asList("date"), DOCKER_HOST).getBody().contains("2015"));
+        Assert.assertTrue(dockerClient.execCommand(container, Arrays.asList("date"), DOCKER_HOST).getBody()
+                        .contains("2015"));
     }
 
 
