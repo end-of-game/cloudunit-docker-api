@@ -36,9 +36,9 @@ public class DockerClient {
      * @throws DockerJSONException
      */
     public Container findContainer(Container container, String host) throws DockerJSONException {
+        logger.info("The client attempts to find a container...");
         try {
             DockerResponse dockerResponse = driver.find(container, host);
-            logger.debug(dockerResponse.getBody());
             handleDockerAPIError(dockerResponse);
             container = objectMapper.readValue(dockerResponse.getBody(), Container.class);
         } catch (FatalDockerJSONException | IOException e) {
@@ -55,8 +55,8 @@ public class DockerClient {
     public List<Container> findAllContainers(String host) throws DockerJSONException {
         List<Container> containers = null;
         try {
+            logger.info("The client attempts to list all containers...");
             DockerResponse dockerResponse = driver.findAll(host);
-            logger.debug(dockerResponse.getBody());
             handleDockerAPIError(dockerResponse);
             containers = objectMapper.readValue(dockerResponse.getBody(),
                     new TypeReference<List<Container>>() {
@@ -74,6 +74,7 @@ public class DockerClient {
      */
     public void createContainer(Container container, String host) throws DockerJSONException {
         try {
+            logger.info("The client attempts to create a container...");
             DockerResponse dockerResponse = driver.create(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -88,6 +89,7 @@ public class DockerClient {
      */
     public void startContainer(Container container, String host) throws DockerJSONException {
         try {
+            logger.info("The client attempts to start a container...");
             DockerResponse dockerResponse = driver.start(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -102,6 +104,7 @@ public class DockerClient {
      */
     public void stopContainer(Container container, String host) throws DockerJSONException {
         try {
+            logger.info("The client attempts to stop a container...");
             DockerResponse dockerResponse = driver.stop(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -112,6 +115,7 @@ public class DockerClient {
     public DockerResponse killContainer(Container container, String host) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to kill a container...");
             dockerResponse = driver.kill(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -129,6 +133,7 @@ public class DockerClient {
     public DockerResponse removeContainer(Container container, String host) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to remove a container...");
             dockerResponse = driver.remove(container, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -148,6 +153,7 @@ public class DockerClient {
     public DockerResponse commitImage(Container container, String host, String tag, String repository) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to commit an image...");
             dockerResponse = driver.commit(container, host, tag, repository);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -166,6 +172,7 @@ public class DockerClient {
     public DockerResponse pushImage(String host, String tag, String repository) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to push an image...");
             dockerResponse = driver.push(host, tag, repository);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -184,6 +191,7 @@ public class DockerClient {
     public DockerResponse pullImage(String host, String tag, String repository) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to pull an image...");
             dockerResponse = driver.pull(host, tag, repository);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -200,8 +208,8 @@ public class DockerClient {
      */
     public Image findAnImage(Image image, String host) throws DockerJSONException {
         DockerResponse dockerResponse = null;
-
         try {
+            logger.info("The client attempts to find an image...");
             dockerResponse = driver.findAnImage(image, host);
             handleDockerAPIError(dockerResponse);
             image = objectMapper.readValue(dockerResponse.getBody(), Image.class);
@@ -220,6 +228,7 @@ public class DockerClient {
     public DockerResponse removeImage(Image image, String host) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to remove an image...");
             dockerResponse = driver.removeImage(image, host);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -238,6 +247,7 @@ public class DockerClient {
     public DockerResponse removeImageIntoTheRegistry(Image image, String host, String registryHost) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to remove an image into the registry...");
             dockerResponse = driver.removeImageIntoRepository(image, host, registryHost);
             handleDockerAPIError(dockerResponse);
         } catch (FatalDockerJSONException e) {
@@ -256,6 +266,7 @@ public class DockerClient {
     public DockerResponse execCommand(Container container, List<String> commands, String host) throws DockerJSONException {
         DockerResponse dockerResponse = null;
         try {
+            logger.info("The client attempts to execute a command into a container...");
             ExecBody execBody = ExecBodyBuilder.anExecBody()
                     .withCmd(commands)
                     .withAttachStdin(Boolean.FALSE)
