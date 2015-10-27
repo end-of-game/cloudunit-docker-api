@@ -25,7 +25,7 @@ public class ImageCommandTests {
     private static DockerClient dockerClient;
     private static final String DOCKER_HOST = "192.168.50.4:4243";
     private static final String CONTAINER_NAME = "myContainer";
-    private final int RUNNING_CONTAINERS = 8;
+    private final int RUNNING_CONTAINERS = 7;
     private final String TAG = "mytag";
     private final String REPOSITORY = "localhost:5000/";
     private final String REGISTRY_HOST = "192.168.50.4:5000";
@@ -51,6 +51,7 @@ public class ImageCommandTests {
                 .build();
         Container container = ContainerBuilder.aContainer().withName(CONTAINER_NAME).withConfig(config).build();
         try {
+            dockerClient.setDriver(new SimpleDockerDriver());
             dockerClient.createContainer(container, DOCKER_HOST);
         } catch (DockerJSONException e) {
             Assert.fail();
