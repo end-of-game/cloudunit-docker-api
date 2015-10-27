@@ -26,11 +26,12 @@ public class ContainerCommandTests {
     private static DockerClient dockerClient;
     private static final String DOCKER_HOST = "192.168.50.4:4243";
     private static final String CONTAINER_NAME = "myContainer";
-    private final int RUNNING_CONTAINERS = 8;
+    private final int RUNNING_CONTAINERS = 7;
 
     @BeforeClass
     public static void setup() {
         dockerClient = new DockerClient();
+        dockerClient.setDriver(new SimpleDockerDriver());
     }
 
 
@@ -52,7 +53,10 @@ public class ContainerCommandTests {
                 .withMemory(0L)
                 .withMemorySwap(0L)
                 .build();
-        Container container = ContainerBuilder.aContainer().withName(CONTAINER_NAME).withConfig(config).build();
+        Container container = ContainerBuilder.aContainer()
+                .withName(CONTAINER_NAME)
+                .withConfig(config)
+                .build();
         dockerClient.createContainer(container, DOCKER_HOST);
         Assert.assertNotNull(dockerClient.findContainer(container, DOCKER_HOST).getId());
     }

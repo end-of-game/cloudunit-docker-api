@@ -23,7 +23,7 @@ public class AdvancedCommandTests {
     private static DockerClient dockerClient;
     private static final String DOCKER_HOST = "192.168.50.4:4243";
     private static final String CONTAINER_NAME = "myContainer";
-    private final int RUNNING_CONTAINERS = 8;
+    private final int RUNNING_CONTAINERS = 7;
     private final String TAG = "mytag";
     private final String REPOSITORY = "localhost:5000/";
     private final String REGISTRY_HOST = "192.168.50.4:5000";
@@ -31,6 +31,8 @@ public class AdvancedCommandTests {
     @BeforeClass
     public static void setup() {
         dockerClient = new DockerClient();
+        dockerClient.setDriver(new SimpleDockerDriver());
+
         HostConfig hostConfig = HostConfigBuilder.aHostConfig()
                 .withVolumesFrom(new ArrayList<>())
                 .build();
@@ -84,7 +86,7 @@ public class AdvancedCommandTests {
                 .build();
         container = dockerClient.findContainer(container, DOCKER_HOST);
         Assert.assertTrue(dockerClient.execCommand(container, Arrays.asList("date"), DOCKER_HOST).getBody()
-                        .contains("2015"));
+                .contains("2015"));
     }
 
 
