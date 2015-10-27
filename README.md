@@ -19,7 +19,7 @@ for your own projects using Docker
 ```bash
 git clone git@github.com:Treeptik/cloudunit-docker-api.git
 cd cloudunit-docker-api
-mvn clean install
+mvn clean install -DskipTests
 ```
 
 - Then, import the dependency in your project's pom.xml :
