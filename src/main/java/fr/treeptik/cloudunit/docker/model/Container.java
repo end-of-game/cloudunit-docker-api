@@ -95,6 +95,12 @@ public class Container implements Serializable {
     @JsonProperty("Status")
     private String status;
 
+    @JsonProperty("GraphDriver")
+    private Object graphDriver;
+
+    @JsonProperty("Mounts")
+    private List<String> mounts;
+
 
     public Config getConfig() {
         return config;

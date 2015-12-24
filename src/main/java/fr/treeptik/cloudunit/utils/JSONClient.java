@@ -27,19 +27,43 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 
 public class JSONClient {
 
     private Logger logger = LoggerFactory.getLogger(JSONClient.class);
+
+    private String certsDirPath;
+
+    private boolean isTLSActivated;
+
+    public JSONClient() {
+        this.certsDirPath = "";
+        isTLSActivated = false;
+    }
+
+    public JSONClient(String certsDirPath, boolean isTLSActivated) {
+        this.isTLSActivated = isTLSActivated;
+        this.certsDirPath = certsDirPath;
+    }
 
     public DockerResponse sendGet(URI uri) throws JSONClientException {
 
@@ -47,10 +71,12 @@ public class JSONClient {
             logger.debug("Send a get request to : " + uri);
         }
         StringBuilder builder = new StringBuilder();
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+
+
         HttpGet httpGet = new HttpGet(uri);
         HttpResponse response = null;
         try {
+            CloseableHttpClient httpclient = buildSecureHttpClient();
             response = httpclient.execute(httpGet);
             LineIterator iterator = IOUtils.lineIterator(response.getEntity()
                     .getContent(), "UTF-8");
@@ -77,12 +103,13 @@ public class JSONClient {
             logger.debug("Content type : " + contentType);
         }
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+
         HttpPost httpPost = new HttpPost(uri);
         httpPost.addHeader("content-type", contentType);
         HttpResponse response = null;
         StringWriter writer = new StringWriter();
         try {
+            CloseableHttpClient httpclient = buildSecureHttpClient();
             httpPost.setEntity(new StringEntity(body));
             response = httpclient.execute(httpPost);
             if (response.getEntity() != null) {
@@ -108,7 +135,7 @@ public class JSONClient {
             logger.debug("Content type : " + contentType);
         }
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
+
         RequestConfig config = RequestConfig.custom()
                 .setSocketTimeout(1000 * 60 * 50)
                 .setConnectTimeout(1000 * 60 * 50).build();
@@ -119,6 +146,7 @@ public class JSONClient {
         HttpResponse response = null;
         StringWriter writer = new StringWriter();
         try {
+            CloseableHttpClient httpclient = buildSecureHttpClient();
             httpPost.setEntity(new StringEntity(body));
             response = httpclient.execute(httpPost);
             IOUtils.copy(response.getEntity().getContent(), writer, "UTF-8");
@@ -139,11 +167,10 @@ public class JSONClient {
         if (logger.isDebugEnabled()) {
             logger.debug("Send a delete request to : " + uri);
         }
-
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpDelete httpDelete = new HttpDelete(uri);
         CloseableHttpResponse response = null;
         try {
+            CloseableHttpClient httpClient = buildSecureHttpClient();
+            HttpDelete httpDelete = new HttpDelete(uri);
             response = httpClient.execute(httpDelete);
         } catch (IOException e) {
             throw new JSONClientException("Error in sendDelete method due to : " + e.getMessage(), e);
@@ -154,5 +181,43 @@ public class JSONClient {
         }
 
         return new DockerResponse(response.getStatusLine().getStatusCode(), "");
+    }
+
+    public CloseableHttpClient buildSecureHttpClient() throws IOException {
+
+        if (isTLSActivated) {
+            org.apache.http.impl.client.HttpClientBuilder builder = HttpClients.custom();
+            HttpClientConnectionManager manager = getConnectionFactory(certsDirPath, 10);
+            builder.setConnectionManager(manager);
+            return builder.build();
+        } else {
+            return HttpClients.createDefault();
+        }
+    }
+
+    private static HttpClientConnectionManager getConnectionFactory(String certPath, int maxConnections) throws IOException {
+        PoolingHttpClientConnectionManager ret = new PoolingHttpClientConnectionManager(getSslFactoryRegistry(certPath));
+        ret.setDefaultMaxPerRoute(maxConnections);
+        return ret;
+    }
+
+    private static Registry<ConnectionSocketFactory> getSslFactoryRegistry(String certPath) throws IOException {
+        try {
+            KeyStore keyStore = KeyStoreUtils.createDockerKeyStore(certPath);
+
+            SSLContext sslContext =
+                    SSLContexts.custom()
+                            .useTLS()
+                            .loadKeyMaterial(keyStore, "docker".toCharArray())
+                            .loadTrustMaterial(keyStore)
+                            .build();
+
+            SSLConnectionSocketFactory sslsf =
+
+                    new SSLConnectionSocketFactory(sslContext);
+            return RegistryBuilder.<ConnectionSocketFactory>create().register("https", sslsf).build();
+        } catch (GeneralSecurityException e) {
+            throw new IOException(e);
+        }
     }
 }

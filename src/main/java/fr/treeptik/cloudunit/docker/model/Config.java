@@ -50,7 +50,7 @@ public class Config implements Serializable {
     private String domainname;
 
     @JsonProperty("Entrypoint")
-    private String entrypoint;
+    private List<String> entrypoint;
 
     @JsonProperty("Env")
     private List<String> env;
@@ -88,7 +88,7 @@ public class Config implements Serializable {
     private String user;
 
     @JsonProperty("Volumes")
-    private String volumes;
+    private Map<String, Map<String, String>> volumes;
 
     @JsonProperty("WorkingDir")
     private String workingDir;
@@ -190,11 +190,11 @@ public class Config implements Serializable {
         this.domainname = domainname;
     }
 
-    public String getEntrypoint() {
+    public List<String> getEntrypoint() {
         return entrypoint;
     }
 
-    public void setEntrypoint(String entrypoint) {
+    public void setEntrypoint(List<String> entrypoint) {
         this.entrypoint = entrypoint;
     }
 
@@ -286,11 +286,11 @@ public class Config implements Serializable {
         this.user = user;
     }
 
-    public String getVolumes() {
+    public Map<String, Map<String, String>> getVolumes() {
         return volumes;
     }
 
-    public void setVolumes(String volumes) {
+    public void setVolumes(Map<String, Map<String, String>> volumes) {
         this.volumes = volumes;
     }
 

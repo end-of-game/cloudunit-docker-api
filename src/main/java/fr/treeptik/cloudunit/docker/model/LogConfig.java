@@ -10,16 +10,16 @@ import java.io.Serializable;
 public class LogConfig implements Serializable {
 
     @JsonProperty("Config")
-    private String config;
+    private Object config;
 
     @JsonProperty("Type")
     private String type;
 
-    public String getConfig() {
+    public Object getConfig() {
         return config;
     }
 
-    public void setConfig(String config) {
+    public void setConfig(Object config) {
         this.config = config;
     }
 

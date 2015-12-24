@@ -39,9 +39,21 @@ public class SimpleDockerDriver implements DockerDriver {
 
     private static Logger logger = LoggerFactory.getLogger(SimpleDockerDriver.class);
 
-    private JSONClient client = new JSONClient();
+    private JSONClient client;
+
+    private String protocol;
 
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    public SimpleDockerDriver() {
+        client = new JSONClient();
+        protocol = "http";
+    }
+
+    public SimpleDockerDriver(String certPathDir, boolean isTLSActivated) {
+        client = new JSONClient(certPathDir, isTLSActivated);
+        protocol = isTLSActivated ? "https" : "http";
+    }
 
 
     @Override
@@ -51,7 +63,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/containers/" + container.getName() + "/json")
                     .build();
@@ -75,7 +87,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/containers/json")
                     .build();
@@ -99,7 +111,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/containers/create")
                     .setParameter("name", container.getName())
@@ -124,7 +136,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath(
                             "/containers/" + container.getName()
@@ -151,7 +163,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath(
                             "/containers/" + container.getName()
@@ -177,7 +189,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/containers/" + container.getName() + "/kill")
                     .build();
@@ -200,7 +212,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/containers/" + container.getName())
                     .setParameter("v", "1")
@@ -226,7 +238,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/images/" + image.getName() + "/json")
                     .build();
@@ -249,7 +261,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/commit")
                     .setParameter("container", container.getName())
@@ -275,7 +287,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/images/" + repository + tag + "/push")
                     .setParameter("tag", tag.toLowerCase()).build();
@@ -300,7 +312,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/images/create")
                     .setParameter("fromImage", repository + tag)
@@ -328,7 +340,8 @@ public class SimpleDockerDriver implements DockerDriver {
         String body = new String();
         DockerResponse dockerResponse = null;
         try {
-            uri = new URIBuilder().setScheme("http").setHost(host)
+            uri = new URIBuilder().setScheme(protocol)
+                    .setHost(host)
                     .setPath("/images/" + image.getId()).build();
             dockerResponse = client.sendDelete(uri);
         } catch (URISyntaxException | JSONClientException e) {
@@ -373,7 +386,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/containers/" + container.getConfig().getHostname() + "/exec")
                     .build();
@@ -398,7 +411,7 @@ public class SimpleDockerDriver implements DockerDriver {
         DockerResponse dockerResponse = null;
         try {
             uri = new URIBuilder()
-                    .setScheme("http")
+                    .setScheme(protocol)
                     .setHost(host)
                     .setPath("/exec/" + execId + "/start")
                     .build();

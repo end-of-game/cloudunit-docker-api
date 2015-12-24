@@ -24,14 +24,14 @@ import java.util.HashMap;
 public class ContainerCommandTests {
 
     private static DockerClient dockerClient;
-    private static final String DOCKER_HOST = "192.168.50.4:4243";
+    private static final String DOCKER_HOST = "cloudunit.dev:2376";
     private static final String CONTAINER_NAME = "myContainer";
     private final int RUNNING_CONTAINERS = 7;
 
     @BeforeClass
     public static void setup() {
         dockerClient = new DockerClient();
-        dockerClient.setDriver(new SimpleDockerDriver());
+        dockerClient.setDriver(new SimpleDockerDriver("/home/guillaume/CloudUnit/cu-vagrant/certificats", true));
     }
 
 
@@ -47,7 +47,7 @@ public class ContainerCommandTests {
                 .withCmd(Arrays.asList("/bin/bash", "/cloudunit/scripts/start-service.sh", "johndoe", "abc2015",
                         "192.168.2.116", "172.17.0.221", "aaaa",
                         "AezohghooNgaegh8ei2jabib2nuj9yoe", "main"))
-                .withImage("cloudunit/git")
+                .withImage("cloudunit/git:dev")
                 .withHostConfig(hostConfig)
                 .withExposedPorts(new HashMap<>())
                 .withMemory(0L)

@@ -39,6 +39,9 @@ public class State implements Serializable {
     @JsonProperty("Dead")
     private Boolean dead;
 
+    @JsonProperty("Status")
+    private String status;
+
     public String getError() {
         return error;
     }

@@ -13,7 +13,7 @@ public class HostConfigBuilder {
     private Boolean publishAllPorts;
     private List<String> links;
     private List<String> binds;
-    private Map<String, String> portBindings;
+    private Map<String, List<Object>> portBindings;
     private List<String> volumesFrom;
     private Long blkioWeight;
     private String capAdd;
@@ -64,7 +64,7 @@ public class HostConfigBuilder {
         return this;
     }
 
-    public HostConfigBuilder withPortBindings(Map<String, String> portBindings) {
+    public HostConfigBuilder withPortBindings(Map<String, List<Object>> portBindings) {
         this.portBindings = portBindings;
         return this;
     }

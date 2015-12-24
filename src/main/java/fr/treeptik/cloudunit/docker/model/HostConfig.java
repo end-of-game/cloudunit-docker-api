@@ -24,7 +24,7 @@ public class HostConfig implements Serializable {
     private List<String> binds;
 
     @JsonProperty("PortBindings")
-    private Map<String, String> portBindings;
+    private Map<String, List<Object>> portBindings;
 
     @JsonProperty("VolumesFrom")
     private List<String> volumesFrom;
@@ -104,6 +104,34 @@ public class HostConfig implements Serializable {
     @JsonProperty("LogConfig")
     private LogConfig logConfig;
 
+    @JsonProperty("MemoryReservation")
+    private Long memoryReservation;
+
+    @JsonProperty("KernelMemory")
+    private Long kernelMemory;
+
+    @JsonProperty("CpuQuota")
+    private Long cpuQuota;
+
+    @JsonProperty("MemorySwappiness")
+    private Boolean memorySwappiness;
+
+    @JsonProperty("DnsOptions")
+    private String dnsOptions;
+
+    @JsonProperty("GroupAdd")
+    private Boolean groupAdd;
+
+    @JsonProperty("UTSMode")
+    private String uTSMode;
+
+    @JsonProperty("ConsoleSize")
+    private List<Long> consoleSize;
+
+    @JsonProperty("VolumeDriver")
+    private String olumeDriver;
+
+
     public Boolean getPrivileged() {
         return privileged;
     }
@@ -136,11 +164,11 @@ public class HostConfig implements Serializable {
         this.binds = binds;
     }
 
-    public Map<String, String> getPortBindings() {
+    public Map<String, List<Object>> getPortBindings() {
         return portBindings;
     }
 
-    public void setPortBindings(Map<String, String> portBindings) {
+    public void setPortBindings(Map<String, List<Object>> portBindings) {
         this.portBindings = portBindings;
     }
 
@@ -350,5 +378,13 @@ public class HostConfig implements Serializable {
 
     public void setLogConfig(LogConfig logConfig) {
         this.logConfig = logConfig;
+    }
+
+    public Long getMemoryReservation() {
+        return memoryReservation;
+    }
+
+    public void setMemoryReservation(Long memoryReservation) {
+        this.memoryReservation = memoryReservation;
     }
 }

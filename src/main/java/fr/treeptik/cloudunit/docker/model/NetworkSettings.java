@@ -46,6 +46,27 @@ public class NetworkSettings implements Serializable {
     @JsonProperty("Ports")
     Map<String, Object> ports;
 
+    @JsonProperty("SandboxKey")
+    private String sandboxKey;
+
+    @JsonProperty("HairpinMode")
+    private Boolean hairpinMode;
+
+    @JsonProperty("SandboxID")
+    private String sandboxID;
+
+    @JsonProperty("SecondaryIPAddresses")
+    private String secondaryIPAddresses;
+
+    @JsonProperty("SecondaryIPv6Addresses")
+    private String secondaryIPv6Addresses;
+
+    @JsonProperty("EndpointID")
+    private String endpointID;
+
+    @JsonProperty("Networks")
+    private Object networks;
+
     public String getBridge() {
         return bridge;
     }

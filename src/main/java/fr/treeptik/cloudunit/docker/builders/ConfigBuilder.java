@@ -22,7 +22,7 @@ public class ConfigBuilder {
     private Long cpuShares;
     private String cpuset;
     private String domainname;
-    private String entrypoint;
+    private List<String> entrypoint;
     private List<String> env;
     private String hostname;
     private Map<String, String> labels;
@@ -34,7 +34,7 @@ public class ConfigBuilder {
     private Boolean stdinOnce;
     private Boolean tty;
     private String user;
-    private String volumes;
+    private Map<String, Map<String, String>> volumes;
     private String workingDir;
 
     private ConfigBuilder() {
@@ -104,7 +104,7 @@ public class ConfigBuilder {
         return this;
     }
 
-    public ConfigBuilder withEntrypoint(String entrypoint) {
+    public ConfigBuilder withEntrypoint(List<String> entrypoint) {
         this.entrypoint = entrypoint;
         return this;
     }
@@ -164,7 +164,7 @@ public class ConfigBuilder {
         return this;
     }
 
-    public ConfigBuilder withVolumes(String volumes) {
+    public ConfigBuilder withVolumes(Map<String, Map<String, String>> volumes) {
         this.volumes = volumes;
         return this;
     }

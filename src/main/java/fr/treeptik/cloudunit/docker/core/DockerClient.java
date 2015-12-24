@@ -597,6 +597,7 @@ public class DockerClient {
         this.driver = driver;
     }
 
+
     public String getDefaultHost() {
         return defaultHost;
     }
